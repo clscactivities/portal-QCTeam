@@ -56,7 +56,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 .logo img{max-height:46px;max-width:150px;object-fit:contain}
 .logo .txt{font-size:12px;font-weight:600;line-height:1.3;color:#ddd;max-width:150px}
 .badge{border:1px solid #ffffff14;background:#ffffff08;color:var(--muted);padding:5px 14px;border-radius:999px;font-size:13px;display:inline-flex;align-items:center;gap:6px}
-.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#9b7fd4;box-shadow:0 0 0 3px #9b7fd422}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#9b7fd4;box-shadow:0 0 0 3px #9b7fd422;transition:.3s}
+.badge.on::before{background:#3fa36b;box-shadow:0 0 0 3px #3fa36b26}
+.badge.off::before{background:#d9a43a;box-shadow:0 0 0 3px #d9a43a26}
 
 .wrap{max-width:900px;margin:auto;padding:36px 18px 80px}
 
@@ -1061,6 +1063,7 @@ function resizeImg(file,max){return new Promise((res,rej)=>{const fr=new FileRea
 (async function boot(){
   try{await Store.init()}catch(e){console.error(e);toast("تعذر الاتصال بقاعدة البيانات، يعمل الآن بوضع التجربة",4000);Store.mode="local"}
   try{await Store.getSettings()}catch(e){console.error(e);Store.settings=Store.defaults()}
+  const bd=$(".badge");bd.classList.add(Store.mode==="cloud"?"on":"off");bd.title=Store.mode==="cloud"?"متصل بقاعدة البيانات":"وضع التجربة — غير متصل بقاعدة البيانات";
   renderLogos();fillTeams($("#inTeam"));buildCriteria();bindRows("members");bindRows("leaders");
   if(user&&Store.settings.teams.includes(user.team)){$("#inName").value=user.name;startForm()}
   if(location.hash==="#leader"){history.replaceState(null,"",location.pathname+location.search);openLeader()}
