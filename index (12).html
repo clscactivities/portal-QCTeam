@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة التقييم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+/* =====================================================================
+   إعدادات Firebase
+   ---------------------------------------------------------------------
+   اتركها null = وضع التجربة (البيانات تنحفظ في نفس الجهاز فقط).
+   للتشغيل الفعلي مع كل الأعضاء الصق إعدادات مشروعك من Firebase هنا:
+   const FIREBASE_CONFIG = {
+     apiKey: "...",
+     authDomain: "...",
+     projectId: "...",
+     storageBucket: "...",
+     messagingSenderId: "...",
+     appId: "..."
+   };
+   ===================================================================== */
+/* حساب القائد الثابت في Firebase Authentication (ما يحتاج يكون إيميل حقيقي) */
+const LEADER_EMAIL = "leader@portal-evau.com";
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyASLoRxGzWfkPwDZz9_S-CwgUqR1K8PSCc",
+  authDomain: "portal-evau.firebaseapp.com",
+  projectId: "portal-evau",
+  storageBucket: "portal-evau.firebasestorage.app",
+  messagingSenderId: "228033866283",
+  appId: "1:228033866283:web:fa006dba527518d54b586e"
+};
+</script>
+<style>
+:root{
+  --bg:#18151f; --bg2:#15121f; --card:#221e30; --card2:#2a2540; --line:#3a3450; --line2:#4a4266;
+  --text:#ece8f5; --muted:#a99cc4; --muted2:#7d7398;
+  --p1:#7b5ea7; --p2:#5f55a0; --accent:#9b7fd4;
+  --ok:#3fa36b; --bad:#d0454c; --warn:#d9a43a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Rubik',system-ui,sans-serif;min-height:100%}
+body{background:radial-gradient(900px 420px at 50% -120px,#2c2442 0%,transparent 70%) no-repeat,var(--bg)}
+::selection{background:#7b5ea766}
+*{scrollbar-width:thin;scrollbar-color:#3a3450 transparent}
+body{line-height:1.6}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+.hidden{display:none!important}
+
+/* ---------- header ---------- */
+.topbar{background:#1d1a27cc;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #ffffff0d;position:sticky;top:0;z-index:20}
+.progress{position:absolute;bottom:-1px;right:0;height:2px;width:0;background:linear-gradient(90deg,var(--p2),var(--accent));transition:width .5s ease;border-radius:2px}
+.topbar .in{max-width:1180px;margin:auto;padding:12px 20px;display:flex;align-items:center;gap:18px}
+.logo{height:46px;display:flex;align-items:center;cursor:default;user-select:none;-webkit-tap-highlight-color:transparent}
+.logo img{max-height:46px;max-width:150px;object-fit:contain}
+.logo .txt{font-size:12px;font-weight:600;line-height:1.3;color:#ddd;max-width:150px}
+.badge{border:1px solid #ffffff14;background:#ffffff08;color:var(--muted);padding:5px 14px;border-radius:999px;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#9b7fd4;box-shadow:0 0 0 3px #9b7fd422}
+
+.wrap{max-width:900px;margin:auto;padding:36px 18px 80px}
+
+/* ---------- login ---------- */
+.login{max-width:430px;margin:56px auto;background:linear-gradient(180deg,#25203400,#25203400),var(--card);border:1px solid #ffffff0f;border-radius:24px;padding:42px 34px;box-shadow:0 1px 0 #ffffff0a inset,0 30px 60px #0005;text-align:center;animation:rise .5s ease both}
+.login .bigLogo{min-height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;user-select:none;-webkit-tap-highlight-color:transparent}
+.login .bigLogo img{max-height:110px;max-width:240px;object-fit:contain}
+.login .bigLogo .txt{font-size:20px;font-weight:700;line-height:1.4}
+.login h1{font-size:30px;font-weight:800}
+.login .sub{color:var(--muted);margin:4px 0 30px}
+.field{text-align:right;margin-bottom:22px}
+.field label{display:block;font-weight:600;margin-bottom:8px}
+.field label small{color:var(--muted);font-weight:400}
+.inp{width:100%;background:#1a1723;border:1px solid #ffffff12;border-radius:12px;padding:13px 16px;outline:none;transition:border-color .2s,box-shadow .2s,background .2s}
+.inp::placeholder{color:#6f6688}
+.inp:hover{border-color:#ffffff22}
+.inp:focus{border-color:#9b7fd499;box-shadow:0 0 0 4px #9b7fd41a;background:#1c1926}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23a99cc4' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 14px center;padding-left:36px}
+select.inp option{background:#221e30}
+textarea.inp{min-height:84px;resize:vertical}
+.btn{border:none;cursor:pointer;border-radius:12px;padding:12px 22px;font-weight:600;transition:filter .2s,transform .15s,border-color .2s,background .2s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.primary{background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;box-shadow:0 6px 18px #5f55a033,0 1px 0 #ffffff26 inset}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.ghost{background:#ffffff06;border:1px solid #ffffff17;color:var(--text)}
+.btn.ghost:hover{border-color:#9b7fd477;background:#9b7fd40f}
+.btn.danger{background:#3a1e28;border:1px solid #6b2b3a;color:#ff9ea6}
+.btn.sm{padding:7px 14px;font-size:13px;border-radius:10px}
+.btn.block{width:100%;padding:15px;font-size:17px}
+.err{color:#ff8f97;font-size:14px;margin-top:-10px;margin-bottom:14px;text-align:right}
+
+/* ---------- form ---------- */
+.hero{text-align:center;margin-bottom:28px}
+.hero{animation:rise .5s ease both}
+.hero .ico{width:68px;height:68px;margin:0 auto 18px;border-radius:20px;background:linear-gradient(135deg,var(--p1),var(--p2));display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 10px 30px #5f55a040,0 1px 0 #ffffff33 inset}
+.hero h1{font-size:38px;font-weight:800;letter-spacing:-.3px}
+.hero p{color:var(--muted);font-size:16.5px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:26px}
+.chip{border:1px solid #ffffff12;background:#ffffff07;border-radius:999px;padding:8px 18px;font-weight:500;display:flex;align-items:center;gap:8px;font-size:15px}
+.chip.btn{padding:8px 18px;color:var(--muted)}
+.chip.btn:hover{color:var(--text)}
+.notice{background:#9b7fd40d;border:1px solid #9b7fd433;border-radius:18px;padding:18px 22px;display:flex;gap:14px;margin-bottom:28px;color:#bfb0dc;font-size:15px;line-height:1.8}
+.notice .lk{font-size:20px;line-height:1.6}
+.notice b{color:#d8c9f5}
+.card{background:var(--card);border:1px solid #ffffff0d;border-radius:22px;padding:28px 30px;margin-bottom:18px;transition:border-color .3s,box-shadow .3s;box-shadow:0 1px 0 #ffffff08 inset;animation:rise .45s ease both}
+.card:focus-within{border-color:#9b7fd433}
+.card.missing{border-color:#d0454c88;box-shadow:0 0 0 4px #d0454c1a}
+.card.rated .num{background:#9b7fd426;color:#d5c6f5}
+.card.rated .num::after{content:'✓';position:absolute;bottom:-4px;left:-4px;width:18px;height:18px;border-radius:50%;background:#3fa36b;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid var(--card)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.chead{display:flex;gap:16px;align-items:flex-start;margin-bottom:18px}
+.num{position:relative;flex:none;width:46px;height:46px;border-radius:14px;background:#ffffff08;border:1px solid #ffffff0f;color:#a993d8;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;transition:.3s}
+.chead h2{font-size:21px;font-weight:700}
+.chead .s{color:var(--muted2);font-size:14.5px}
+.q{font-weight:500;font-size:16px;margin-bottom:18px;color:#ddd6ec;line-height:1.8}
+.rate{display:flex;gap:8px;flex-wrap:wrap}
+.rate button{width:50px;height:50px;border-radius:14px;background:#1a1723;border:1px solid #ffffff10;font-weight:500;font-size:16px;color:#bdb3d3;cursor:pointer;transition:background .2s,border-color .2s,color .2s,transform .15s}
+.rate button:hover{border-color:#9b7fd466;color:var(--text)}
+.rate button.on{color:var(--c);background:color-mix(in srgb,var(--c) 16%,#1a1723);border-color:color-mix(in srgb,var(--c) 70%,transparent);font-weight:700;transform:translateY(-2px)}
+.scale{display:flex;justify-content:space-between;color:var(--muted2);font-size:13px;margin:10px 0 16px}
+.lbl{font-weight:500;margin:14px 0 8px;display:block;font-size:14.5px;color:#cfc6e2}
+.tbl-h,.trow{display:grid;grid-template-columns:1.4fr .7fr 1.4fr 40px;gap:10px;align-items:center}
+.tbl-h{color:var(--muted2);font-size:12.5px;padding:0 4px 8px;border-bottom:1px solid #ffffff0d;margin-bottom:12px}
+.trow{margin-bottom:10px}
+.trow .inp{padding:10px 12px}
+.xbtn{width:38px;height:38px;border-radius:10px;border:1px solid #ffffff10;background:transparent;color:#8d82a6;cursor:pointer;font-size:14px;transition:.2s}
+.xbtn:hover{border-color:#d0454c66;color:#ff8f97;background:#d0454c12}
+.trow{animation:rise .3s ease both}
+.empty{border:1px dashed #ffffff17;border-radius:12px;padding:16px;text-align:center;color:var(--muted2);font-size:14px;margin-bottom:12px}
+.submitWrap{text-align:center;margin-top:30px}
+.submitWrap .btn{padding:15px 56px;font-size:16.5px}
+.submitWrap .hint2{color:var(--muted2);font-size:13px;margin-top:10px}
+.done{text-align:center;padding:70px 20px;animation:rise .5s ease both}
+.done .big{width:84px;height:84px;margin:0 auto 8px;border-radius:50%;background:#3fa36b1f;border:1px solid #3fa36b55;color:#7fe0a8;font-size:38px;display:flex;align-items:center;justify-content:center}
+.done h2{font-size:30px;margin:10px 0}
+.done p{color:var(--muted);margin-bottom:26px}
+
+/* ---------- modal / toast ---------- */
+.modal{position:fixed;inset:0;background:#0b0912b3;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;animation:fade .2s ease both}
+@keyframes fade{from{opacity:0}}
+.mbox{animation:rise .25s ease both;background:var(--card);border:1px solid #ffffff14;border-radius:22px;padding:28px;width:100%;max-width:440px;box-shadow:0 30px 70px #000a;max-height:92vh;overflow:auto}
+.mbox.wide{max-width:900px}
+.mbox h3{font-size:21px;margin-bottom:10px}
+.mbox p{color:var(--muted);margin-bottom:20px}
+.mact{display:flex;gap:10px;justify-content:flex-start;margin-top:18px;flex-wrap:wrap}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#26213acc;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid #ffffff14;padding:11px 20px;border-radius:999px;z-index:200;box-shadow:0 10px 30px #0006;font-size:14.5px;animation:toastIn .25s ease both;max-width:92vw;text-align:center}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* ---------- admin ---------- */
+.admin{position:fixed;inset:0;background:var(--bg2);z-index:50;overflow:auto}
+.ahead{position:sticky;top:0;background:#1d192a;border-bottom:1px solid var(--line);z-index:5}
+.ahead .in{max-width:1240px;margin:auto;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ahead h2{font-size:20px;flex:1}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{background:none;border:1px solid transparent;padding:8px 16px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:600}
+.tab.on{background:#2b2540;border-color:var(--line2);color:var(--text)}
+.abody{max-width:1240px;margin:auto;padding:24px 20px 80px}
+.filters{display:flex;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:20px;align-items:flex-end}
+.filters .f{display:flex;flex-direction:column;gap:4px;min-width:150px;flex:1}
+.filters .f span{font-size:12px;color:var(--muted)}
+.filters .inp{padding:9px 12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.kpi .v{font-size:28px;font-weight:700}
+.kpi .k{color:var(--muted);font-size:13px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:20px}
+.panel h3{font-size:18px;margin-bottom:4px}
+.panel .hint{color:var(--muted);font-size:13px;margin-bottom:14px}
+.tw{overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+table.dt th{text-align:right;color:var(--muted);font-weight:500;font-size:12.5px;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.dt td{padding:10px 8px;border-bottom:1px solid #2c2740;vertical-align:middle}
+table.dt tr.click{cursor:pointer}
+table.dt tr.click:hover td{background:#26213a}
+.sc{display:inline-block;min-width:36px;text-align:center;padding:2px 8px;border-radius:8px;font-weight:700;color:#fff;font-size:13px}
+.st{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.st.up{background:#1d3b2c;color:#7fe0a8}.st.down{background:#43202a;color:#ff9aa2}.st.flat{background:#2d2a3c;color:#c9c0dc}.st.one{background:#262236;color:var(--muted2)}
+.delta.up{color:#7fe0a8}.delta.down{color:#ff9aa2}.delta.flat{color:var(--muted)}
+.seg{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.seg button{background:#1e1a2b;border:1px solid var(--line);border-radius:10px;padding:6px 14px;cursor:pointer;color:var(--muted)}
+.seg button.on{border-color:var(--accent);color:var(--text)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.ccard{text-align:right;background:#1e1a2b;border:1px solid #ffffff12;border-radius:16px;padding:18px;cursor:pointer;color:var(--text);display:flex;flex-direction:column;gap:8px;transition:border-color .2s,transform .15s,background .2s}
+.ccard:hover{border-color:#9b7fd477;background:#231e33;transform:translateY(-2px)}
+.ccard.none{opacity:.55}
+.ccard .ct{font-size:18px;font-weight:700}
+.ccard .ch{font-size:13.5px;color:var(--muted)}
+.ccard .cm{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--muted);align-items:center}
+.ccard .cs{display:flex;gap:6px;flex-wrap:wrap}
+.muted2{color:var(--muted2)}
+.exp{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.expc{background:#1e1a2b;border:1px solid var(--line);border-radius:16px;padding:20px}
+.expc .i{font-size:34px}
+.expc h4{font-size:18px;margin:6px 0}
+.expc ul{color:var(--muted);font-size:13.5px;padding-right:18px;margin-bottom:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.teamList{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tchip{background:#1e1a2b;border:1px solid var(--line2);border-radius:10px;padding:6px 8px 6px 12px;display:flex;align-items:center;gap:8px;font-size:14px}
+.tchip button{background:none;border:none;color:#ff8f97;cursor:pointer;font-size:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.logoPrev{width:100%;height:120px;border:1px dashed var(--line2);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;background:#1b1827;color:var(--muted)}
+.logoPrev img{max-height:100px;max-width:90%;object-fit:contain}
+.note{background:#1e1a2b;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.note .d{color:var(--muted);font-size:12px;display:flex;justify-content:space-between}
+.sub-ans{background:#1e1a2b;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.sub-ans b{display:block;color:#c5b2ea;margin-bottom:4px;font-size:14px}
+.sub-ans div{white-space:pre-wrap;font-size:14px}
+.muted{color:var(--muted)}
+.modeTag{font-size:12px;padding:4px 10px;border-radius:8px;background:#3b3020;color:#f2c96b;border:1px solid #6b5426}
+.modeTag.cloud{background:#1d3b2c;color:#7fe0a8;border-color:#2d6b4a}
+
+@media (max-width:700px){
+  .hero h1{font-size:30px}
+  .card{padding:22px 18px}
+  .rate button{width:calc(20% - 7px);height:46px}
+  .tbl-h{display:none}
+  .trow{grid-template-columns:1fr 90px 40px;background:#1e1a2b;padding:10px;border-radius:12px}
+  .trow .noteIn{grid-column:1 / -1;grid-row:2}
+  .grid2{grid-template-columns:1fr}
+  .login{padding:34px 22px;margin-top:30px}
+  .submitWrap .btn{width:100%}
+  .rate button{border-radius:12px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="in">
+    <div class="logo" id="topLogo" title=""></div>
+    <span class="badge">سري ومغلق</span>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<!-- ============ تسجيل الدخول ============ -->
+<main class="wrap" id="vLogin">
+  <div class="login">
+    <div class="bigLogo" id="loginLogo"></div>
+    <h1>بوابة التقييم</h1>
+    <p class="sub">تقييم أداء فرق عمل النادي</p>
+    <div class="field">
+      <label>الاسم <small>(الاسم الثلاثي)</small></label>
+      <input class="inp" id="inName" autocomplete="name">
+    </div>
+    <div class="field">
+      <label>الفريق</label>
+      <select class="inp" id="inTeam"></select>
+    </div>
+    <div class="err hidden" id="loginErr"></div>
+    <button class="btn primary block" id="btnStart">بدء التقييم</button>
+  </div>
+</main>
+
+<!-- ============ النموذج ============ -->
+<main class="wrap hidden" id="vForm">
+  <div class="hero">
+    <div class="ico">📋</div>
+    <h1>نموذج تقييم الأداء</h1>
+    <p>تقرير التقييم الدوري لفرق العمل في النادي</p>
+  </div>
+  <div class="chips">
+    <span class="chip">👤 <span id="chName"></span></span>
+    <span class="chip">🗂️ <span id="chTeam"></span></span>
+    <span class="chip" id="chEventWrap">📅 فعالية: <span id="chEvent"></span></span>
+    <button class="chip btn" id="btnChange">تغيير المستخدم</button>
+  </div>
+  <div class="notice">
+    <div class="lk">🔒</div>
+    <div>
+      يهدف هذا التقرير إلى تقييم أداء الفريق بشكل شامل من خلال رصد آلية العمل، ومستوى الالتزام والإنجاز، وجودة المخرجات، والتواصل والتفاعل.<br>
+      <b>جميع المعلومات تعامل بسرية تامة ولا تُشارك خارج إطار التقييم والتطوير المستمر للنادي.</b>
+    </div>
+  </div>
+  <div id="criteria"></div>
+
+  <section class="card">
+    <div class="chead"><div class="num">5</div><div><h2>التحديات وكيفية التعامل معها</h2><div class="s">إن وجدت</div></div></div>
+    <div class="q">ما أبرز التحديات أو الصعوبات التي واجهتك أو واجهت الفريق أثناء العمل؟ وكيف تم التعامل معها؟ وهل ترى أن طريقة التعامل معها كانت مناسبة؟</div>
+    <label class="lbl">التحديات</label><textarea class="inp" data-k="ch_text" placeholder="اذكر التحديات..."></textarea>
+    <label class="lbl">كيفية التعامل معها</label><textarea class="inp" data-k="ch_handling" placeholder="كيف تم التعامل معها..."></textarea>
+    <label class="lbl">الحلول والمقترحات</label><textarea class="inp" data-k="ch_solutions" placeholder="الحلول المقترحة للتحسين..."></textarea>
+  </section>
+
+  <section class="card">
+    <div class="chead"><div class="num">6</div><div><h2>الحلول والتحسينات</h2><div class="s">في حال الحاجة إلى التحسين</div></div></div>
+    <div class="q">من وجهة نظرك، ما الحلول أو التغييرات التي يمكن تطبيقها لتحسين أداء الفريق؟ اذكر أي أفكار أو مقترحات تراها مناسبة.</div>
+    <label class="lbl">المقترحات</label><textarea class="inp" data-k="suggestions" placeholder="اكتب مقترحاتك..."></textarea>
+  </section>
+
+  <section class="card" id="cardMembers">
+    <div class="chead"><div class="num">👥</div><div><h2>تقييم أعضاء الفريق</h2><div class="s">الالتزام، التعاون، تحمل المسؤولية، المبادرة، التفاعل</div></div></div>
+    <div class="q">كيف تقيم أداء أعضاء الفريق بشكل عام؟</div>
+    <div class="tbl-h"><span>اسم العضو</span><span>التقييم من ١٠</span><span>الملاحظات (إن وجدت)</span><span></span></div>
+    <div id="rowsMembers"></div>
+    <button class="btn ghost sm" data-add="members">+ إضافة عضو</button>
+  </section>
+
+  <section class="card" id="cardLeaders">
+    <div class="chead"><div class="num">⭐</div><div><h2>تقييم قادة الفريق</h2><div class="s">التنظيم، توزيع المهام، المتابعة، التواصل، الدعم، حل المشكلات، وتحفيز الأعضاء</div></div></div>
+    <div class="q">كيف تقيم أداء قائد الفريق ونائبه؟</div>
+    <div class="tbl-h"><span>اسم القائد / النائب</span><span>التقييم من ١٠</span><span>الملاحظات (إن وجدت)</span><span></span></div>
+    <div id="rowsLeaders"></div>
+    <button class="btn ghost sm" data-add="leaders">+ إضافة قائد / نائب</button>
+  </section>
+
+  <section class="card">
+    <div class="chead"><div class="num">▦</div><div><h2>التقييم النهائي</h2><div class="s">خلاصة تقييمك الشامل للأداء</div></div></div>
+    <label class="lbl">التقييم العام للأعضاء</label><textarea class="inp" data-k="fin_members" placeholder="اكتب رأيك العام في أداء الأعضاء..."></textarea>
+    <label class="lbl">التقييم العام للقادة</label><textarea class="inp" data-k="fin_leaders" placeholder="اكتب رأيك العام في أداء القادة..."></textarea>
+    <label class="lbl">التقييم العام للفريق ككل</label><textarea class="inp" data-k="fin_team" placeholder="اكتب رأيك النهائي والشامل عن أداء الفريق ككل..."></textarea>
+  </section>
+
+  <div class="submitWrap"><button class="btn primary" id="btnSubmit">إرسال التقرير النهائي</button><div class="hint2" id="progText"></div></div>
+</main>
+
+<!-- ============ تم الإرسال ============ -->
+<main class="wrap hidden" id="vDone">
+  <div class="done">
+    <div class="big">✓</div>
+    <h2>تم إرسال تقريرك بنجاح</h2>
+    <p>شكراً لك، تقييمك يساعدنا على تطوير أداء الفرق.</p>
+    <button class="btn primary" id="btnAgain">تقييم جديد</button>
+  </div>
+</main>
+
+<!-- ============ لوحة القائد ============ -->
+<div class="admin hidden" id="admin">
+  <div class="ahead"><div class="in">
+    <h2>🔐 لوحة القائد <span class="modeTag" id="modeTag"></span></h2>
+    <div class="tabs">
+      <button class="tab on" data-tab="comm">اللجان</button>
+      <button class="tab" data-tab="track">المتابعة</button>
+      <button class="tab" data-tab="teams">أداء اللجان</button>
+      <button class="tab" data-tab="subs">النماذج</button>
+      <button class="tab" data-tab="export">التصدير</button>
+      <button class="tab" data-tab="settings">الإعدادات</button>
+    </div>
+    <button class="btn ghost sm" id="btnCloseAdmin">✕ إغلاق</button>
+  </div></div>
+  <div class="abody">
+    <div class="filters" id="filters">
+      <div class="f"><span>اللجنة</span><select class="inp" id="fTeam"></select></div>
+      <div class="f"><span>الفعالية / الدورة</span><select class="inp" id="fCycle"></select></div>
+      <div class="f"><span>من تاريخ</span><input type="date" class="inp" id="fFrom"></div>
+      <div class="f"><span>إلى تاريخ</span><input type="date" class="inp" id="fTo"></div>
+      <button class="btn ghost sm" id="fReset">مسح الفلاتر</button>
+    </div>
+    <div id="tab-comm"></div>
+    <div id="tab-track" class="hidden"></div>
+    <div id="tab-teams" class="hidden"></div>
+    <div id="tab-subs" class="hidden"></div>
+    <div id="tab-export" class="hidden"></div>
+    <div id="tab-settings" class="hidden"></div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+/* ===================== ثوابت ===================== */
+const DEFAULT_TEAMS=["التقارير والاحصاء","المحتوى","الموارد البشرية","الدعم اللوجستي","العلاقات العامة","الاعلام","التصميم"];
+const DEFAULT_CLUB="نادي علوم المختبرات الإكلينيكية";
+const CRITERIA=[
+ {id:"commitment",title:"الالتزام",sub:"مدى الالتزام بالمهام والمواعيد المتفق عليها",q:"كيف تقيم مستوى التزام أعضاء الفريق بالمهام؟ وهل كان هناك تأخير أو تقصير؟ وضّح مع ذكر أمثلة إن وجدت."},
+ {id:"achievement",title:"الإنجاز",sub:"نسبة تحقيق المهام والمخرجات",q:"إلى أي مدى تم إنجاز المهام والأعمال المطلوبة من الفريق؟ وهل تم تحقيق المخرجات المطلوبة؟ وضّح مستوى الإنجاز وأبرز ما تم إنجازه."},
+ {id:"quality",title:"جودة المخرجات",sub:"الوضوح والدقة ومطابقة المطلوب",q:"كيف تقيم جودة الأعمال والمخرجات المقدمة من الفريق؟ هل كانت واضحة، دقيقة، ومطابقة للمطلوب؟ وما الجوانب التي يمكن تحسينها إن وجدت؟"},
+ {id:"communication",title:"التواصل والتفاعل",sub:"سرعة التجاوب ووضوح التعليمات والمتابعة",q:"كيف تقيم مستوى التواصل والتفاعل داخل الفريق؟ من حيث سرعة التجاوب، وضوح التعليمات، ومتابعة القادة للمهام."}
+];
+const MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+const ROLE_LBL={member:"عضو",leader:"قائد / نائب"};
+
+/* ===================== أدوات ===================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm=s=>String(s||"").trim().replace(/\s+/g," ").replace(/[أإآٱ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").replace(/[ً-ْـ]/g,"").toLowerCase();
+const pad=n=>String(n).padStart(2,"0");
+const fmtDate=t=>{const d=new Date(t);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`};
+const fmtDT=t=>{const d=new Date(t);return `${fmtDate(t)} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+const r1=n=>n==null||isNaN(n)?null:Math.round(n*10)/10;
+const avg=a=>{a=a.filter(x=>typeof x==="number"&&!isNaN(x));return a.length?a.reduce((s,x)=>s+x,0)/a.length:null};
+const scoreColor=v=>`hsl(${Math.round((v-1)/9*130)},62%,42%)`;
+const scHTML=v=>v==null?'<span class="muted">—</span>':`<span class="sc" style="background:${scoreColor(v)}">${r1(v)}</span>`;
+const monthCycle=t=>{const d=new Date(t);return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`};
+const MEM={};
+const LS={get(k,d){try{const v=localStorage.getItem(k);if(v!=null)return JSON.parse(v)}catch(e){}return k in MEM?JSON.parse(MEM[k]):d},set(k,v){MEM[k]=JSON.stringify(v);try{localStorage.setItem(k,MEM[k])}catch(e){}},del(k){delete MEM[k];try{localStorage.removeItem(k)}catch(e){}}};
+const SS={get(k){try{return sessionStorage.getItem(k)}catch(e){return MEM["ss_"+k]??null}},set(k,v){MEM["ss_"+k]=v;try{sessionStorage.setItem(k,v)}catch(e){}},del(k){delete MEM["ss_"+k];try{sessionStorage.removeItem(k)}catch(e){}}};
+/* حفظ الملفات: داخل Claude عبر downloads، وخارجه تنزيل عادي */
+let DL=null;const dlReady=(async()=>{try{if(window.claude&&window.claude.use)DL=await window.claude.use("downloads")}catch(e){}})();
+async function saveFile(name,data,mime){
+  if(window.claude&&window.claude.use){await dlReady;if(DL){try{await DL.save({filename:name,data});return true}catch(e){if(e&&e.code==="declined")return false;throw new Error(e?.message||"تعذر الحفظ")}}}
+  const blob=data instanceof Blob?data:new Blob([data],{type:mime});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);return true;
+}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`))return res();const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("تعذر تحميل "+src));document.head.appendChild(s)})}
+async function sha(s){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){return "p:"+s}}
+
+function toast(msg,ms=2600){const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),ms)}
+function modal(html,{wide=false}={}){const root=$("#modalRoot");const m=document.createElement("div");m.className="modal";m.innerHTML=`<div class="mbox ${wide?"wide":""}">${html}</div>`;m.addEventListener("mousedown",e=>{if(e.target===m)m.remove()});root.appendChild(m);return m}
+function confirmBox(title,text,okText="تأكيد",danger=false){return new Promise(res=>{const m=modal(`<h3>${esc(title)}</h3><p>${esc(text)}</p><div class="mact"><button class="btn ${danger?"danger":"primary"}" data-ok>${esc(okText)}</button><button class="btn ghost" data-no>إلغاء</button></div>`);m.querySelector("[data-ok]").onclick=()=>{m.remove();res(true)};m.querySelector("[data-no]").onclick=()=>{m.remove();res(false)}})}
+
+/* ===================== التخزين ===================== */
+const Store={
+  mode:"local",settings:null,
+  async init(){
+    if(FIREBASE_CONFIG){
+      const v="10.12.2",b=`https://www.gstatic.com/firebasejs/${v}/`;
+      await loadScript(b+"firebase-app-compat.js");
+      await Promise.all([loadScript(b+"firebase-firestore-compat.js"),loadScript(b+"firebase-auth-compat.js")]);
+      firebase.initializeApp(FIREBASE_CONFIG);
+      this.db=firebase.firestore();this.auth=firebase.auth();this.mode="cloud";
+      await new Promise(r=>{const u=this.auth.onAuthStateChanged(()=>{u();r()})});
+    }
+  },
+  defaults(){return{teams:[...DEFAULT_TEAMS],logo:"",clubName:DEFAULT_CLUB,cycle:"",roster:{}}},
+  async getSettings(){
+    let s;
+    if(this.mode==="cloud"){const d=await this.db.doc("config/settings").get();s=d.exists?d.data():null}
+    else s=LS.get("ep_settings",null);
+    this.settings=Object.assign(this.defaults(),s||{});return this.settings;
+  },
+  async saveSettings(s){
+    this.settings=s;
+    if(this.mode==="cloud")await this.db.doc("config/settings").set(s);
+    else LS.set("ep_settings",s);
+  },
+  async addEvaluation(e){
+    if(this.mode==="cloud"){await this.db.collection("evaluations").add(e)}
+    else{const a=LS.get("ep_evals",[]);a.push({...e,id:uid()});LS.set("ep_evals",a)}
+  },
+  async listEvaluations(){
+    if(this.mode==="cloud"){const q=await this.db.collection("evaluations").orderBy("createdAt").get();return q.docs.map(d=>({id:d.id,...d.data()}))}
+    return LS.get("ep_evals",[]).sort((a,b)=>a.createdAt-b.createdAt);
+  },
+  async deleteEvaluation(id){
+    if(this.mode==="cloud")await this.db.collection("evaluations").doc(id).delete();
+    else LS.set("ep_evals",LS.get("ep_evals",[]).filter(e=>e.id!==id));
+  },
+  async listNotes(){
+    if(this.mode==="cloud"){const q=await this.db.collection("leaderNotes").orderBy("createdAt").get();return q.docs.map(d=>({id:d.id,...d.data()}))}
+    return LS.get("ep_notes",[]);
+  },
+  async addNote(n){
+    if(this.mode==="cloud")await this.db.collection("leaderNotes").add(n);
+    else{const a=LS.get("ep_notes",[]);a.push({...n,id:uid()});LS.set("ep_notes",a)}
+  },
+  async deleteNote(id){
+    if(this.mode==="cloud")await this.db.collection("leaderNotes").doc(id).delete();
+    else LS.set("ep_notes",LS.get("ep_notes",[]).filter(n=>n.id!==id));
+  },
+  isLeader(){return this.mode==="cloud"?!!this.auth.currentUser:SS.get("ep_leader")==="1"},
+  leaderExists(){return this.mode==="cloud"?!!this.settings?.leaderSet:!!LS.get("ep_pass",null)},
+  async createLeader(pass){
+    if(this.mode==="cloud"){
+      try{await this.auth.createUserWithEmailAndPassword(LEADER_EMAIL,pass)}
+      catch(e){
+        if(e.code==="auth/email-already-in-use")throw new Error("كلمة مرور القائد معيّنة مسبقاً — اختر «عندي كلمة مرور»");
+        if(e.code==="auth/operation-not-allowed"||e.code==="auth/admin-restricted-operation")throw new Error("فعّل Email/Password في Firebase أولاً");
+        throw new Error("تعذر الحفظ: "+(e.code||e.message));
+      }
+      this.settings.leaderSet=true;await this.saveSettings(this.settings);return true;
+    }
+    if(LS.get("ep_pass",null))throw new Error("كلمة مرور القائد معيّنة مسبقاً");
+    LS.set("ep_pass",await sha(pass));SS.set("ep_leader","1");return true;
+  },
+  async login(email,pass){
+    if(this.mode==="cloud"){await this.auth.signInWithEmailAndPassword(LEADER_EMAIL,pass);return true}
+    const saved=LS.get("ep_pass",null);
+    if(saved&&await sha(pass)===saved){SS.set("ep_leader","1");return true}
+    throw new Error("كلمة المرور غير صحيحة");
+  },
+  async logout(){if(this.mode==="cloud")await this.auth.signOut();SS.del("ep_leader")},
+  async changePass(p,cur){
+    if(this.mode==="cloud"){
+      const u=this.auth.currentUser;if(!u)throw new Error("سجّل دخولك من جديد");
+      try{await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(LEADER_EMAIL,cur))}catch(e){throw new Error("كلمة المرور الحالية غير صحيحة")}
+      try{await u.updatePassword(p)}catch(e){throw new Error(e.code==="auth/weak-password"?"كلمة المرور ضعيفة، لازم 6 أحرف أو أكثر":"تعذر التغيير، حاول مرة ثانية")}
+      return;
+    }
+    const saved=LS.get("ep_pass",null);
+    if(!saved||await sha(cur)!==saved)throw new Error("كلمة المرور الحالية غير صحيحة");
+    LS.set("ep_pass",await sha(p));
+  }
+};
+
+/* ===================== الشعار ===================== */
+function renderLogos(){
+  const s=Store.settings;
+  const html=s.logo?`<img src="${s.logo}" alt="${esc(s.clubName)}">`:`<span class="txt">${esc(s.clubName||DEFAULT_CLUB)}</span>`;
+  $("#topLogo").innerHTML=html;$("#loginLogo").innerHTML=html;
+}
+/* دخول القائد: فقط من الرابط الخاص (آخره #leader) ثم كلمة المرور */
+window.addEventListener("hashchange",()=>{if(location.hash==="#leader"){history.replaceState(null,"",location.pathname+location.search);openLeader()}});
+
+/* ===================== تسجيل دخول المقيّم ===================== */
+let user=LS.get("ep_user",null);
+function fillTeams(sel,withAll){
+  const t=Store.settings.teams;
+  sel.innerHTML=(withAll?`<option value="">كل الفرق</option>`:`<option value="">— اختر الفريق —</option>`)+t.map(x=>`<option>${esc(x)}</option>`).join("");
+}
+function show(v){["#vLogin","#vForm","#vDone"].forEach(x=>$(x).classList.toggle("hidden",x!==v));window.scrollTo(0,0);updateProgress()}
+$("#btnStart").onclick=()=>{
+  const name=$("#inName").value.trim().replace(/\s+/g," "),team=$("#inTeam").value,er=$("#loginErr");
+  if(name.split(" ").length<3){er.textContent="فضلاً اكتب اسمك الثلاثي";er.classList.remove("hidden");return}
+  if(!team){er.textContent="فضلاً اختر الفريق";er.classList.remove("hidden");return}
+  er.classList.add("hidden");user={name,team};LS.set("ep_user",user);startForm();
+};
+$("#btnChange").onclick=async()=>{
+  if(await confirmBox("تغيير المستخدم","هل أنت متأكد من رغبتك في تسجيل الخروج وإلغاء النموذج الحالي؟","نعم، خروج",true)){
+    LS.del(draftKey());LS.del("ep_user");user=null;$("#inName").value="";$("#inTeam").value="";show("#vLogin");
+  }
+};
+$("#btnAgain").onclick=()=>startForm();
+
+/* ===================== النموذج ===================== */
+const form={scores:{},rows:{members:[],leaders:[]}};
+function draftKey(){return user?"ep_draft_"+norm(user.name)+"|"+user.team:"ep_draft_"}
+function buildCriteria(){
+  $("#criteria").innerHTML=CRITERIA.map((c,i)=>`
+  <section class="card" id="card_${c.id}">
+    <div class="chead"><div class="num">${i+1}</div><div><h2>${c.title}</h2><div class="s">${c.sub}</div></div></div>
+    <div class="q">${c.q}</div>
+    <div class="rate" data-c="${c.id}">${Array.from({length:10},(_,k)=>`<button type="button" data-v="${k+1}">${k+1}</button>`).join("")}</div>
+    <div class="scale"><span>1 = ضعيف جداً</span><span>10 = ممتاز</span></div>
+    <label class="lbl">الملاحظات</label>
+    <textarea class="inp" data-k="note_${c.id}" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+  </section>`).join("");
+  $$(".rate").forEach(r=>r.addEventListener("click",e=>{
+    const b=e.target.closest("button");if(!b)return;
+    form.scores[r.dataset.c]=+b.dataset.v;paintRate(r);$("#card_"+r.dataset.c).classList.remove("missing");saveDraft();
+  }));
+}
+function paintRate(r){const v=form.scores[r.dataset.c];[...r.children].forEach(b=>{const on=+b.dataset.v===v;b.classList.toggle("on",on);b.style.setProperty("--c",on?`hsl(${Math.round((v-1)/9*130)},65%,62%)`:"")});$("#card_"+r.dataset.c)?.classList.toggle("rated",!!v);updateProgress()}
+function updateProgress(){const n=CRITERIA.filter(c=>form.scores[c.id]).length;const onForm=!$("#vForm").classList.contains("hidden");$("#progress").style.width=onForm?(n/CRITERIA.length*100)+"%":"0";const t=$("#progText");if(t)t.textContent=n<CRITERIA.length?`باقي ${CRITERIA.length-n} من التقييمات الأساسية`:"جاهز للإرسال ✓"}
+function rosterFor(kind){const r=(Store.settings.roster||{})[user?.team]||{};return (kind==="members"?r.members:r.leaders)||[]}
+function renderRows(kind){
+  const box=kind==="members"?$("#rowsMembers"):$("#rowsLeaders"),rows=form.rows[kind];
+  const ph=kind==="members"?"اسم العضو":"اسم القائد / النائب";
+  if(!rows.length){box.innerHTML=`<div class="empty">${kind==="members"?"لم تُضف أي عضو بعد — اضغط «إضافة عضو» بالأسفل":"لم تُضف أي قائد بعد — اضغط «إضافة قائد / نائب» بالأسفل"}</div>`;return}
+  const dl=`dl_${kind}`;
+  box.innerHTML=`<datalist id="${dl}">${rosterFor(kind).map(n=>`<option value="${esc(n)}">`).join("")}</datalist>`+rows.map((r,i)=>`
+    <div class="trow" data-i="${i}">
+      <input class="inp" list="${dl}" data-f="name" placeholder="${ph}" value="${esc(r.name)}">
+      <select class="inp" data-f="score"><option value="">—</option>${Array.from({length:10},(_,k)=>`<option ${r.score==k+1?"selected":""}>${k+1}</option>`).join("")}</select>
+      <input class="inp noteIn" data-f="note" placeholder="ملاحظات (إن وجدت)" value="${esc(r.note)}">
+      <button class="xbtn" data-del title="حذف">✕</button>
+    </div>`).join("");
+}
+function bindRows(kind){
+  const box=kind==="members"?$("#rowsMembers"):$("#rowsLeaders");
+  box.addEventListener("input",e=>{const row=e.target.closest(".trow");if(!row)return;const f=e.target.dataset.f;const r=form.rows[kind][+row.dataset.i];r[f]=f==="score"?(e.target.value?+e.target.value:null):e.target.value;e.target.style.borderColor="";saveDraft()});
+  box.addEventListener("change",e=>{if(e.target.dataset.f==="score"){const row=e.target.closest(".trow");form.rows[kind][+row.dataset.i].score=e.target.value?+e.target.value:null;saveDraft()}});
+  box.addEventListener("click",e=>{if(e.target.closest("[data-del]")){const i=+e.target.closest(".trow").dataset.i;form.rows[kind].splice(i,1);renderRows(kind);saveDraft()}});
+}
+$$("[data-add]").forEach(b=>b.onclick=()=>{const k=b.dataset.add;form.rows[k].push({name:"",score:null,note:""});renderRows(k);const ins=$$(`#${k==="members"?"rowsMembers":"rowsLeaders"} [data-f=name]`);ins[ins.length-1]?.focus();saveDraft()});
+document.addEventListener("input",e=>{if(e.target.matches("#vForm textarea[data-k]"))saveDraft()});
+
+function collect(){
+  const t=k=>($(`[data-k="${k}"]`)?.value||"").trim();
+  const clean=a=>a.filter(r=>r.name.trim()).map(r=>({name:r.name.trim().replace(/\s+/g," "),score:r.score,note:(r.note||"").trim()}));
+  return{
+    scores:{...form.scores},
+    notes:Object.fromEntries(CRITERIA.map(c=>[c.id,t("note_"+c.id)])),
+    challenges:{text:t("ch_text"),handling:t("ch_handling"),solutions:t("ch_solutions")},
+    suggestions:t("suggestions"),
+    members:clean(form.rows.members),leaders:clean(form.rows.leaders),
+    final:{members:t("fin_members"),leaders:t("fin_leaders"),team:t("fin_team")}
+  };
+}
+function saveDraft(){if(!user)return;const texts={};$$("#vForm textarea[data-k]").forEach(x=>texts[x.dataset.k]=x.value);LS.set(draftKey(),{scores:form.scores,rows:form.rows,texts})}
+function startForm(){
+  $("#chName").textContent=user.name;$("#chTeam").textContent=user.team;$("#chEvent").textContent=Store.settings.cycle;$("#chEventWrap").classList.toggle("hidden",!Store.settings.cycle);
+  const d=LS.get(draftKey(),null);
+  form.scores=d?.scores||{};form.rows=d?.rows||{members:[],leaders:[]};
+  $$("#vForm textarea[data-k]").forEach(x=>x.value=d?.texts?.[x.dataset.k]||"");
+  $$(".rate").forEach(paintRate);$$(".card.missing").forEach(c=>c.classList.remove("missing"));
+  renderRows("members");renderRows("leaders");show("#vForm");
+}
+$("#btnSubmit").onclick=async()=>{
+  const data=collect();
+  const miss=CRITERIA.filter(c=>!data.scores[c.id]);
+  miss.forEach(c=>$("#card_"+c.id).classList.add("missing"));
+  if(miss.length){$("#card_"+miss[0].id).scrollIntoView({behavior:"smooth",block:"center"});toast("فضلاً حدد التقييم من 1 إلى 10 في: "+miss.map(c=>c.title).join("، "));return}
+  const noScore=[...$$("#rowsMembers .trow"),...$$("#rowsLeaders .trow")].filter(r=>r.querySelector("[data-f=name]").value.trim()&&!r.querySelector("[data-f=score]").value);
+  if(noScore.length){noScore.forEach(r=>r.querySelector("[data-f=score]").style.borderColor="var(--bad)");noScore[0].scrollIntoView({behavior:"smooth",block:"center"});toast("فضلاً اختر تقييم لكل اسم أضفته");return}
+  if(!await confirmBox("إرسال التقرير","بعد الإرسال ما تقدر تعدل على التقرير. متأكد؟","إرسال"))return;
+  const btn=$("#btnSubmit");btn.disabled=true;btn.textContent="جاري الإرسال...";
+  try{
+    await Store.addEvaluation({...data,evaluator:user.name,team:user.team,cycle:Store.settings.cycle||monthCycle(Date.now()),createdAt:Date.now()});
+    LS.del(draftKey());show("#vDone");
+  }catch(e){toast("تعذر الإرسال، تأكد من الاتصال وحاول مرة ثانية");console.error(e)}
+  btn.disabled=false;btn.textContent="إرسال التقرير النهائي";
+};
+
+/* ===================== لوحة القائد ===================== */
+let ALL=[],NOTES=[],curTab="comm",trackRole="all";
+async function openLeader(mode){
+  if(Store.isLeader())return showAdmin();
+  mode=mode||(Store.leaderExists()?"login":"create");
+  const create=mode==="create";
+  const m=modal(create?`<h3>🔐 تعيين كلمة مرور القائد</h3><p>أول دخول للوحة القائد: اختر كلمة مرور (6 أحرف أو أكثر). بتدخل فيها كل مرة، وتقدر تغيّرها من الإعدادات.</p>
+    <div class="field"><label>كلمة المرور</label><input class="inp" id="lgPass" type="password" dir="ltr"></div>
+    <div class="field"><label>تأكيد كلمة المرور</label><input class="inp" id="lgPass2" type="password" dir="ltr"></div>
+    <div class="err hidden" id="lgErr"></div>
+    <div class="mact"><button class="btn primary" id="lgGo">حفظ والدخول</button><button class="btn ghost" id="lgNo">إلغاء</button></div>
+    <p style="margin:14px 0 0;font-size:13px"><a href="#" id="lgSwitch" style="color:var(--accent)">عندي كلمة مرور، أبي أسجل دخول</a></p>`
+  :`<h3>🔐 دخول القائد</h3><p>أدخل كلمة مرور القائد</p>
+    <div class="field"><label>كلمة المرور</label><input class="inp" id="lgPass" type="password" dir="ltr"></div>
+    <div class="err hidden" id="lgErr"></div>
+    <div class="mact"><button class="btn primary" id="lgGo">دخول</button><button class="btn ghost" id="lgNo">إلغاء</button></div>`);
+  m.querySelector("#lgNo").onclick=()=>m.remove();
+  m.querySelector("#lgSwitch")?.addEventListener("click",e=>{e.preventDefault();m.remove();openLeader("login")});
+  const err=t=>{const er=m.querySelector("#lgErr");er.textContent=t;er.classList.remove("hidden")};
+  const go=async()=>{
+    const p=m.querySelector("#lgPass").value,btn=m.querySelector("#lgGo");
+    if(create){
+      if(p.length<6)return err("كلمة المرور لازم 6 أحرف أو أكثر");
+      if(p!==m.querySelector("#lgPass2").value)return err("كلمتا المرور غير متطابقتين");
+      btn.disabled=true;try{await Store.createLeader(p);m.remove();showAdmin();toast("تم تعيين كلمة المرور ✓")}catch(e){err(e.message);btn.disabled=false}
+    }else{
+      btn.disabled=true;try{await Store.login("",p);m.remove();showAdmin()}catch(e){err("كلمة المرور غير صحيحة");btn.disabled=false}
+    }
+  };
+  m.querySelector("#lgGo").onclick=go;m.querySelectorAll("input").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")go()}));
+  setTimeout(()=>m.querySelector("input")?.focus(),50);
+}
+async function showAdmin(){
+  $("#admin").classList.remove("hidden");document.body.style.overflow="hidden";
+  const t=$("#modeTag");t.textContent=Store.mode==="cloud"?"متصل بقاعدة البيانات":"وضع التجربة (هذا الجهاز فقط)";t.classList.toggle("cloud",Store.mode==="cloud");
+  await reloadData();
+}
+async function reloadData(){
+  try{[ALL,NOTES]=await Promise.all([Store.listEvaluations(),Store.listNotes()])}catch(e){toast("تعذر جلب البيانات: "+e.message);console.error(e)}
+  fillTeams($("#fTeam"),true);
+  const cyc=cycleOrder(ALL);$("#fCycle").innerHTML=`<option value="">كل الفعاليات</option>`+cyc.map(c=>`<option>${esc(c)}</option>`).join("");
+  renderTab();
+}
+$("#btnCloseAdmin").onclick=()=>{$("#admin").classList.add("hidden");document.body.style.overflow=""};
+$$(".tab").forEach(b=>b.onclick=()=>{curTab=b.dataset.tab;$$(".tab").forEach(x=>x.classList.toggle("on",x===b));renderTab()});
+["#fTeam","#fCycle","#fFrom","#fTo"].forEach(s=>$(s).addEventListener("change",renderTab));
+$("#fReset").onclick=()=>{["#fTeam","#fCycle","#fFrom","#fTo"].forEach(s=>$(s).value="");renderTab()};
+function renderTab(){
+  ["comm","track","teams","subs","export","settings"].forEach(t=>$("#tab-"+t).classList.toggle("hidden",t!==curTab));
+  $("#filters").classList.toggle("hidden",curTab==="settings");
+  ({comm:renderComm,track:renderTrack,teams:renderTeams,subs:renderSubs,export:renderExport,settings:renderSettings})[curTab]();
+}
+function filters(){return{team:$("#fTeam").value,cycle:$("#fCycle").value,from:$("#fFrom").value,to:$("#fTo").value}}
+function filtered(){
+  const f=filters();
+  const from=f.from?new Date(f.from+"T00:00:00").getTime():-Infinity,to=f.to?new Date(f.to+"T23:59:59").getTime():Infinity;
+  return ALL.filter(e=>(!f.team||e.team===f.team)&&(!f.cycle||e.cycle===f.cycle)&&e.createdAt>=from&&e.createdAt<=to).sort((a,b)=>a.createdAt-b.createdAt);
+}
+function filterDesc(){const f=filters();const p=[];p.push("اللجنة: "+(f.team||"كل اللجان"));p.push("الفعالية: "+(f.cycle||"كل الفعاليات"));if(f.from||f.to)p.push(`الفترة: ${f.from||"البداية"} ← ${f.to||"اليوم"}`);return p.join(" | ")}
+
+/* ---------- الحسابات ---------- */
+function cycleOrder(evals){const m=new Map();evals.forEach(e=>{const c=e.cycle||monthCycle(e.createdAt);if(!m.has(c)||m.get(c)>e.createdAt)m.set(c,e.createdAt)});return [...m.entries()].sort((a,b)=>a[1]-b[1]).map(x=>x[0])}
+function evalAvg(e){return avg(CRITERIA.map(c=>e.scores?.[c.id]))}
+function status(delta,n){if(n<2)return{k:"one",t:"تقييم واحد"};if(delta>=0.5)return{k:"up",t:"↑ تحسّن"};if(delta<=-0.5)return{k:"down",t:"↓ تراجع"};return{k:"flat",t:"= ثابت"}}
+function buildPersons(evals){
+  const cyc=cycleOrder(evals),map=new Map();
+  evals.forEach(e=>{
+    [["member",e.members||[]],["leader",e.leaders||[]]].forEach(([role,list])=>list.forEach(r=>{
+      if(!r.name||r.score==null)return;
+      const key=role+"|"+e.team+"|"+norm(r.name);
+      if(!map.has(key))map.set(key,{key,role,team:e.team,name:r.name,records:[]});
+      const p=map.get(key);p.name=r.name;
+      p.records.push({t:e.createdAt,cycle:e.cycle||monthCycle(e.createdAt),evaluator:e.evaluator,score:+r.score,note:r.note||"",evalId:e.id});
+    }));
+  });
+  const out=[...map.values()].map(p=>{
+    p.records.sort((a,b)=>a.t-b.t);
+    p.records.forEach((r,i)=>r.diff=i?r.score-p.records[i-1].score:null);
+    p.points=cyc.map(c=>{const rs=p.records.filter(r=>r.cycle===c);return rs.length?{cycle:c,avg:avg(rs.map(r=>r.score)),n:rs.length}:null}).filter(Boolean);
+    p.first=p.points[0]?.avg;p.last=p.points.at(-1)?.avg;p.prev=p.points.length>1?p.points.at(-2).avg:null;
+    p.delta=p.prev==null?null:p.last-p.prev;p.total=p.points.length>1?p.last-p.first:null;
+    p.mean=avg(p.records.map(r=>r.score));p.status=status(p.delta??0,p.points.length);
+    p.lastNote=[...p.records].reverse().find(r=>r.note)?.note||"";
+    p.leaderNotes=NOTES.filter(n=>n.key===p.key).sort((a,b)=>a.createdAt-b.createdAt);
+    return p;
+  });
+  const ord={down:0,flat:1,up:2,one:3};
+  return out.sort((a,b)=>a.role.localeCompare(b.role)||ord[a.status.k]-ord[b.status.k]||a.team.localeCompare(b.team,"ar")||a.name.localeCompare(b.name,"ar"));
+}
+function buildTeams(evals){
+  const cyc=cycleOrder(evals),rows=[];
+  const teams=[...new Set(evals.map(e=>e.team))].sort((a,b)=>a.localeCompare(b,"ar"));
+  teams.forEach(t=>{let prev=null;cyc.forEach(c=>{
+    const es=evals.filter(e=>e.team===t&&(e.cycle||monthCycle(e.createdAt))===c);if(!es.length)return;
+    const crit=Object.fromEntries(CRITERIA.map(x=>[x.id,avg(es.map(e=>e.scores?.[x.id]))]));
+    const all=avg(Object.values(crit));
+    const mem=avg(es.flatMap(e=>(e.members||[]).map(m=>m.score)).filter(x=>x!=null).map(Number));
+    const led=avg(es.flatMap(e=>(e.leaders||[]).map(m=>m.score)).filter(x=>x!=null).map(Number));
+    rows.push({team:t,cycle:c,n:es.length,crit,all,mem,led,delta:prev==null?null:all-prev});prev=all;
+  })});
+  return rows;
+}
+function spark(points){
+  if(points.length<2)return "";
+  const w=90,h=26,xs=i=>4+i*(w-8)/(points.length-1),ys=v=>h-3-(v-1)/9*(h-6);
+  const d=points.map((p,i)=>`${i?"L":"M"}${xs(i).toFixed(1)},${ys(p.avg).toFixed(1)}`).join(" ");
+  const col=points.at(-1).avg>=points.at(-2).avg?"#7fe0a8":"#ff9aa2";
+  return `<svg width="${w}" height="${h}" style="vertical-align:middle"><path d="${d}" fill="none" stroke="${col}" stroke-width="2"/>${points.map((p,i)=>`<circle cx="${xs(i)}" cy="${ys(p.avg)}" r="2.4" fill="${col}"/>`).join("")}</svg>`;
+}
+const deltaHTML=d=>d==null?'<span class="muted">—</span>':`<span class="delta ${d>=0.5?"up":d<=-0.5?"down":"flat"}" style="unicode-bidi:isolate;direction:ltr;display:inline-block">\u2066${d>0?"+":""}${r1(d)}\u2069</span>`;
+
+/* ---------- تبويب المتابعة ---------- */
+function renderTrack(){
+  const ev=filtered(),persons=buildPersons(ev);
+  const list=persons.filter(p=>trackRole==="all"||p.role===trackRole);
+  const up=persons.filter(p=>p.status.k==="up").length,down=persons.filter(p=>p.status.k==="down").length;
+  $("#tab-track").innerHTML=`
+  <div class="kpis">
+    <div class="kpi"><div class="v">${ev.length}</div><div class="k">نموذج تقييم مُرسل</div></div>
+    <div class="kpi"><div class="v">${new Set(ev.map(e=>norm(e.evaluator)+e.team)).size}</div><div class="k">شخص قيّم</div></div>
+    <div class="kpi"><div class="v">${persons.length}</div><div class="k">عضو وقائد تم تقييمهم</div></div>
+    <div class="kpi"><div class="v" style="color:#7fe0a8">${up}</div><div class="k">تحسّن عن الدورة السابقة</div></div>
+    <div class="kpi"><div class="v" style="color:#ff9aa2">${down}</div><div class="k">تراجع ويحتاج متابعة</div></div>
+    <div class="kpi"><div class="v">${r1(avg(ev.map(evalAvg)))??"—"}</div><div class="k">متوسط تقييم الفرق /10</div></div>
+  </div>
+  <div class="panel">
+    <h3>متابعة الأعضاء والقادة</h3>
+    <div class="hint">كل اسم مع تقييماته عبر الدورات. اضغط على أي اسم تشوف سجله كامل وتضيف ملاحظتك كقائد. الحالة تقارن آخر دورة بالدورة اللي قبلها (فرق نص درجة أو أكثر).</div>
+    <div class="seg">${[["all","الكل"],["member","الأعضاء"],["leader","القادة والنواب"]].map(([k,t])=>`<button data-role="${k}" class="${trackRole===k?"on":""}">${t}</button>`).join("")}</div>
+    ${list.length?`<div class="tw"><table class="dt"><thead><tr><th>الاسم</th><th>الدور</th><th>الفريق</th><th>عدد التقييمات</th><th>أول دورة</th><th>آخر دورة</th><th>التغير</th><th>المسار</th><th>الحالة</th><th>ملاحظات القائد</th></tr></thead><tbody>
+      ${list.map(p=>`<tr class="click" data-key="${esc(p.key)}"><td><b>${esc(p.name)}</b></td><td>${ROLE_LBL[p.role]}</td><td>${esc(p.team)}</td><td>${p.records.length}</td><td>${scHTML(p.first)}</td><td>${scHTML(p.last)}</td><td>${deltaHTML(p.delta)}</td><td>${spark(p.points)}</td><td><span class="st ${p.status.k}">${p.status.t}</span></td><td>${p.leaderNotes.length?"📝 "+p.leaderNotes.length:'<span class="muted">—</span>'}</td></tr>`).join("")}
+    </tbody></table></div>`:`<div class="empty">ما فيه تقييمات للأعضاء أو القادة حسب الفلاتر الحالية</div>`}
+  </div>`;
+  $$("#tab-track [data-role]").forEach(b=>b.onclick=()=>{trackRole=b.dataset.role;renderTrack()});
+  $$("#tab-track tr[data-key]").forEach(tr=>tr.onclick=()=>personModal(tr.dataset.key));
+}
+function personModal(key){
+  const p=buildPersons(filtered()).find(x=>x.key===key);if(!p)return;
+  const m=modal(`
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><h3>${esc(p.name)}</h3><span class="st ${p.status.k}">${p.status.t}</span></div>
+    <p style="margin-bottom:14px">${ROLE_LBL[p.role]} — فريق ${esc(p.team)}</p>
+    <div class="kpis">
+      <div class="kpi"><div class="v">${p.records.length}</div><div class="k">مرات التقييم</div></div>
+      <div class="kpi"><div class="v">${r1(p.mean)}</div><div class="k">المتوسط العام</div></div>
+      <div class="kpi"><div class="v">${p.total==null?"—":"\u200E"+(p.total>0?"+":"")+r1(p.total)}</div><div class="k">التغير من أول دورة</div></div>
+    </div>
+    <div class="panel"><h3>المسار حسب الدورات</h3>
+      <div class="tw"><table class="dt" style="min-width:420px"><thead><tr><th>الدورة</th><th>متوسط التقييم</th><th>عدد المقيّمين</th><th>التغير</th></tr></thead><tbody>
+      ${p.points.map((x,i)=>`<tr><td>${esc(x.cycle)}</td><td>${scHTML(x.avg)}</td><td>${x.n}</td><td>${deltaHTML(i?x.avg-p.points[i-1].avg:null)}</td></tr>`).join("")}
+      </tbody></table></div></div>
+    <div class="panel"><h3>سجل التقييمات</h3>
+      <div class="tw"><table class="dt" style="min-width:600px"><thead><tr><th>التاريخ</th><th>الدورة</th><th>المقيِّم</th><th>التقييم</th><th>عن السابق</th><th>الملاحظة</th></tr></thead><tbody>
+      ${p.records.map(r=>`<tr><td>${fmtDate(r.t)}</td><td>${esc(r.cycle)}</td><td>${esc(r.evaluator)}</td><td>${scHTML(r.score)}</td><td>${deltaHTML(r.diff)}</td><td>${esc(r.note)||'<span class="muted">—</span>'}</td></tr>`).join("")}
+      </tbody></table></div></div>
+    <div class="panel"><h3>📝 ملاحظات القائد</h3><div class="hint">ملاحظاتك تظهر في التقارير المصدّرة مع سجل الشخص.</div>
+      <div id="pmNotes">${p.leaderNotes.map(n=>`<div class="note"><div class="d"><span>${fmtDT(n.createdAt)}${n.cycle?" — "+esc(n.cycle):""}</span><button class="btn ghost sm" data-dn="${n.id}">حذف</button></div><div style="white-space:pre-wrap">${esc(n.note)}</div></div>`).join("")||'<div class="empty">ما فيه ملاحظات بعد</div>'}</div>
+      <textarea class="inp" id="pmNote" placeholder="مثال: تحسّن واضح في الالتزام بعد اجتماع المتابعة، نكلفه بمهمة أكبر الدورة الجاية..."></textarea>
+      <div class="mact"><button class="btn primary" id="pmSave">حفظ الملاحظة</button><button class="btn ghost" id="pmClose">إغلاق</button></div>
+    </div>`,{wide:true});
+  m.querySelector("#pmClose").onclick=()=>m.remove();
+  m.querySelector("#pmSave").onclick=async()=>{
+    const v=m.querySelector("#pmNote").value.trim();if(!v)return;
+    try{await Store.addNote({key:p.key,name:p.name,role:p.role,team:p.team,note:v,cycle:Store.settings.cycle||monthCycle(Date.now()),createdAt:Date.now()});NOTES=await Store.listNotes();m.remove();renderTab();personModal(key);toast("تم حفظ الملاحظة")}catch(e){toast("تعذر الحفظ: "+e.message)}
+  };
+  m.querySelectorAll("[data-dn]").forEach(b=>b.onclick=async()=>{if(!await confirmBox("حذف الملاحظة","متأكد من حذف هذي الملاحظة؟","حذف",true))return;await Store.deleteNote(b.dataset.dn);NOTES=await Store.listNotes();m.remove();renderTab();personModal(key)});
+}
+
+/* ---------- تبويب اللجان ---------- */
+let openCommittee=null;
+function renderComm(){
+  const fT=$("#fTeam").value;
+  if(openCommittee&&fT!==openCommittee)openCommittee=fT||null;
+  if(openCommittee)return renderCommDetail(openCommittee);
+  const ev=filtered(),persons=buildPersons(ev),teams=buildTeams(ev);
+  const names=fT?[fT]:[...new Set([...Store.settings.teams,...committeesOf(ev)])];
+  $("#tab-comm").innerHTML=`<div class="panel"><h3>اللجان</h3><div class="hint">اضغط على أي لجنة تشوف كل شي يخصها في مكان واحد: المسؤول، المقيّمون، أداؤها، متابعة أعضائها، وتقاريرها.</div>
+  <div class="cgrid">${names.map(t=>{
+    const es=ev.filter(e=>e.team===t),last=teams.filter(x=>x.team===t).at(-1),ps=persons.filter(p=>p.team===t);
+    const dn=ps.filter(p=>p.status.k==="down").length,upn=ps.filter(p=>p.status.k==="up").length,heads=committeeHeads(t,ev);
+    return `<button class="ccard ${es.length?"":"none"}" data-comm="${esc(t)}">
+      <div class="ct">${esc(t)}</div>
+      <div class="ch">👤 ${heads.length?heads.map(esc).join("، "):'<span class="muted2">المسؤول غير محدد</span>'}</div>
+      ${es.length?`<div class="cm"><span>${es.length} تقرير</span><span>${committeeEvaluators(t,ev).length} مقيّم</span><span>المتوسط ${scHTML(last?.all)} ${deltaHTML(last?.delta)}</span></div>
+      <div class="cs">${dn?`<span class="st down">⚠ ${dn} يحتاج متابعة</span>`:""}${upn?`<span class="st up">↑ ${upn} تحسّن</span>`:""}${!dn&&!upn?`<span class="st flat">لا تغييرات</span>`:""}</div>`
+      :`<div class="cm muted2">لا توجد تقارير بعد</div>`}
+    </button>`}).join("")}</div></div>`;
+  $$("#tab-comm [data-comm]").forEach(b=>b.onclick=()=>{openCommittee=b.dataset.comm;$("#fTeam").value=openCommittee;renderComm();window.scrollTo(0,0);$("#admin").scrollTo(0,0)});
+}
+function renderCommDetail(t){
+  const ev=filtered(),persons=buildPersons(ev).filter(p=>p.team===t),tr=buildTeams(ev).filter(x=>x.team===t);
+  const heads=committeeHeads(t,ev),evs=committeeEvaluators(t,ev),last=tr.at(-1);
+  const pTable=list=>list.length?`<div class="tw"><table class="dt"><thead><tr><th>الاسم</th><th>مرات التقييم</th><th>أول تقييم</th><th>آخر تقييم</th><th>التغير</th><th>المسار</th><th>الحالة</th><th>ملاحظات القائد</th></tr></thead><tbody>
+    ${list.map(p=>`<tr class="click" data-key="${esc(p.key)}"><td><b>${esc(p.name)}</b></td><td>${p.records.length}</td><td>${scHTML(p.first)}</td><td>${scHTML(p.last)}</td><td>${deltaHTML(p.delta)}</td><td>${spark(p.points)}</td><td><span class="st ${p.status.k}">${p.status.t}</span></td><td>${p.leaderNotes.length?"📝 "+p.leaderNotes.length:'<span class="muted">—</span>'}</td></tr>`).join("")}
+    </tbody></table></div>`:'<div class="empty">لا يوجد</div>';
+  $("#tab-comm").innerHTML=`
+  <button class="btn ghost sm" id="commBack" style="margin-bottom:16px">→ كل اللجان</button>
+  <div class="panel">
+    <h3 style="font-size:22px">لجنة ${esc(t)}</h3>
+    <div class="row" style="margin-top:10px;gap:8px"><span class="muted">المسؤول:</span>${heads.length?heads.map(h=>`<span class="tchip" style="padding:5px 12px">⭐ ${esc(h)}</span>`).join(""):'<span class="muted2">غير محدد — أضفه من الإعدادات ← أسماء أعضاء كل فريق</span>'}</div>
+    <div class="row" style="margin-top:8px;gap:8px"><span class="muted">المقيّمون:</span>${evs.map(x=>`<span class="tchip" style="padding:5px 12px">${esc(x.name)} <span class="muted">(${x.n})</span></span>`).join("")||'<span class="muted2">—</span>'}</div>
+    <div class="row" style="margin-top:16px"><button class="btn primary sm" id="commXlsx" ${ev.length?"":"disabled"}>📊 تصدير اللجنة Excel</button><button class="btn ghost sm" id="commDoc" ${ev.length?"":"disabled"}>📄 تصدير اللجنة Word</button></div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div class="v">${ev.length}</div><div class="k">تقرير</div></div>
+    <div class="kpi"><div class="v">${scHTML(last?.all)}</div><div class="k">متوسط آخر فعالية ${deltaHTML(last?.delta)}</div></div>
+    <div class="kpi"><div class="v" style="color:#7fe0a8">${persons.filter(p=>p.status.k==="up").length}</div><div class="k">تحسّن</div></div>
+    <div class="kpi"><div class="v" style="color:#ff9aa2">${persons.filter(p=>p.status.k==="down").length}</div><div class="k">يحتاج متابعة</div></div>
+  </div>
+  <div class="panel"><h3>أداء اللجنة حسب الفعالية</h3>
+    ${tr.length?`<div class="tw"><table class="dt"><thead><tr><th>الفعالية</th><th>التقارير</th>${CRITERIA.map(c=>`<th>${c.title}</th>`).join("")}<th>المتوسط</th><th>التغير</th><th>تقييم الأعضاء</th><th>تقييم القادة</th></tr></thead><tbody>
+    ${tr.map(r=>`<tr><td><b>${esc(r.cycle)}</b></td><td>${r.n}</td>${CRITERIA.map(c=>`<td>${scHTML(r.crit[c.id])}</td>`).join("")}<td>${scHTML(r.all)}</td><td>${deltaHTML(r.delta)}</td><td>${scHTML(r.mem)}</td><td>${scHTML(r.led)}</td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">لا توجد تقارير</div>'}
+  </div>
+  <div class="panel"><h3>👥 متابعة الأعضاء</h3><div class="hint">اضغط على الاسم لسجله الكامل وإضافة ملاحظتك.</div>${pTable(persons.filter(p=>p.role==="member"))}</div>
+  <div class="panel"><h3>⭐ متابعة القائد والنائب</h3>${pTable(persons.filter(p=>p.role==="leader"))}</div>
+  <div class="panel"><h3>📋 التقارير المقدّمة (${ev.length})</h3><div class="hint">اضغط على أي تقرير لعرضه كامل.</div>
+    ${ev.length?`<div class="tw"><table class="dt"><thead><tr><th>معد التقرير</th><th>الفعالية</th><th>التاريخ</th>${CRITERIA.map(c=>`<th>${c.title}</th>`).join("")}<th>المتوسط</th></tr></thead><tbody>
+    ${ev.slice().reverse().map(e=>`<tr class="click" data-id="${esc(e.id)}"><td><b>${esc(e.evaluator)}</b></td><td>${esc(e.cycle)}</td><td>${fmtDate(e.createdAt)}</td>${CRITERIA.map(c=>`<td>${scHTML(e.scores?.[c.id])}</td>`).join("")}<td>${scHTML(evalAvg(e))}</td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">لا توجد تقارير</div>'}
+  </div>`;
+  $("#commBack").onclick=()=>{openCommittee=null;$("#fTeam").value="";renderComm()};
+  $("#commXlsx").onclick=exportExcel;$("#commDoc").onclick=exportWord;
+  $$("#tab-comm tr[data-key]").forEach(r=>r.onclick=()=>personModal(r.dataset.key));
+  $$("#tab-comm tr[data-id]").forEach(r=>r.onclick=()=>subModal(r.dataset.id));
+}
+
+/* ---------- تبويب أداء الفرق ---------- */
+function renderTeams(){
+  const rows=buildTeams(filtered());
+  $("#tab-teams").innerHTML=`<div class="panel"><h3>أداء الفرق حسب الدورات</h3><div class="hint">متوسط المعايير الأربعة لكل فريق في كل دورة، مع متوسط تقييم الأعضاء والقادة، والتغير عن الدورة السابقة لنفس الفريق.</div>
+  ${rows.length?`<div class="tw"><table class="dt"><thead><tr><th>الفريق</th><th>الدورة</th><th>النماذج</th>${CRITERIA.map(c=>`<th>${c.title}</th>`).join("")}<th>المتوسط</th><th>التغير</th><th>تقييم الأعضاء</th><th>تقييم القادة</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td><b>${esc(r.team)}</b></td><td>${esc(r.cycle)}</td><td>${r.n}</td>${CRITERIA.map(c=>`<td>${scHTML(r.crit[c.id])}</td>`).join("")}<td>${scHTML(r.all)}</td><td>${deltaHTML(r.delta)}</td><td>${scHTML(r.mem)}</td><td>${scHTML(r.led)}</td></tr>`).join("")}
+  </tbody></table></div>`:`<div class="empty">ما فيه بيانات حسب الفلاتر الحالية</div>`}</div>`;
+}
+
+/* ---------- تبويب النماذج ---------- */
+function renderSubs(){
+  const ev=filtered().slice().reverse();
+  $("#tab-subs").innerHTML=`<div class="panel"><h3>النماذج المرسلة (${ev.length})</h3><div class="hint">اضغط على أي نموذج لعرض إجاباته كاملة.</div>
+  ${ev.length?`<div class="tw"><table class="dt"><thead><tr><th>التاريخ</th><th>الدورة</th><th>المقيِّم</th><th>الفريق</th>${CRITERIA.map(c=>`<th>${c.title}</th>`).join("")}<th>المتوسط</th><th>أعضاء</th><th>قادة</th></tr></thead><tbody>
+  ${ev.map(e=>`<tr class="click" data-id="${esc(e.id)}"><td>${fmtDT(e.createdAt)}</td><td>${esc(e.cycle)}</td><td><b>${esc(e.evaluator)}</b></td><td>${esc(e.team)}</td>${CRITERIA.map(c=>`<td>${scHTML(e.scores?.[c.id])}</td>`).join("")}<td>${scHTML(evalAvg(e))}</td><td>${(e.members||[]).length}</td><td>${(e.leaders||[]).length}</td></tr>`).join("")}
+  </tbody></table></div>`:`<div class="empty">ما فيه نماذج حسب الفلاتر الحالية</div>`}</div>`;
+  $$("#tab-subs tr[data-id]").forEach(tr=>tr.onclick=()=>subModal(tr.dataset.id));
+}
+function subModal(id){
+  const e=ALL.find(x=>x.id===id);if(!e)return;
+  const A=(t,v)=>`<div class="sub-ans"><b>${t}</b><div>${esc(v)||'<span class="muted">—</span>'}</div></div>`;
+  const tbl=(list,lbl)=>list?.length?`<div class="tw"><table class="dt" style="min-width:400px"><thead><tr><th>${lbl}</th><th>التقييم</th><th>الملاحظات</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.name)}</td><td>${scHTML(r.score)}</td><td>${esc(r.note)||"—"}</td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">لا يوجد</div>';
+  const m=modal(`<h3>نموذج ${esc(e.evaluator)}</h3><p>فريق ${esc(e.team)} — ${esc(e.cycle)} — ${fmtDT(e.createdAt)}</p>
+    ${CRITERIA.map(c=>`<div class="sub-ans"><b>${c.title} ${scHTML(e.scores?.[c.id])}</b><div>${esc(e.notes?.[c.id])||'<span class="muted">بدون ملاحظات</span>'}</div></div>`).join("")}
+    ${A("التحديات",e.challenges?.text)}${A("كيفية التعامل معها",e.challenges?.handling)}${A("الحلول والمقترحات",e.challenges?.solutions)}${A("المقترحات لتحسين الفريق",e.suggestions)}
+    <div class="panel"><h3>تقييم الأعضاء</h3>${tbl(e.members,"العضو")}</div>
+    <div class="panel"><h3>تقييم القادة</h3>${tbl(e.leaders,"القائد / النائب")}</div>
+    ${A("التقييم العام للأعضاء",e.final?.members)}${A("التقييم العام للقادة",e.final?.leaders)}${A("التقييم العام للفريق ككل",e.final?.team)}
+    <div class="mact"><button class="btn ghost" data-x>إغلاق</button><button class="btn danger" data-del>حذف النموذج</button></div>`,{wide:true});
+  m.querySelector("[data-x]").onclick=()=>m.remove();
+  m.querySelector("[data-del]").onclick=async()=>{if(!await confirmBox("حذف النموذج","سيتم حذف هذا النموذج نهائياً من التقارير. متأكد؟","حذف",true))return;await Store.deleteEvaluation(id);m.remove();await reloadData();toast("تم الحذف")};
+}
+
+/* ---------- تبويب التصدير ---------- */
+function renderExport(){
+  const n=filtered().length;
+  $("#tab-export").innerHTML=`<div class="panel"><h3>تصدير التقارير</h3><div class="hint">التصدير يطبّق الفلاتر اللي فوق (${esc(filterDesc())}) — عدد النماذج: ${n}</div>
+  <div class="exp">
+    <div class="expc"><div class="i">📊</div><h4>ملف Excel</h4><ul>
+      <li>ملخص المتابعة: كل عضو وقائد، أول وآخر دورة، التغير والحالة</li>
+      <li>سجل التقييمات: كل مرة انقيّم فيها الشخص، مين قيّمه، والفرق عن السابق</li>
+      <li>أداء الفرق حسب الدورات</li>
+      <li>النماذج المرسلة كاملة بكل الإجابات</li>
+      <li>المقيّمون: كم مرة قيّم كل شخص ومتى</li>
+      <li>ملاحظات القائد</li>
+      <li><b>ورقة مستقلة لكل لجنة</b> فيها المسؤول عنها، والمقيّمون، وكل تقرير بنفس ترتيب النموذج</li></ul>
+      <button class="btn primary" id="exXlsx" ${n?"":"disabled"}>تصدير Excel</button></div>
+    <div class="expc"><div class="i">📄</div><h4>تقرير Word</h4><ul>
+      <li>ملخص عام ونظرة على كل اللجان ومسؤوليها</li>
+      <li><b>قسم مستقل لكل لجنة</b> يبدأ بصفحة جديدة: المسؤول، المقيّمون، أداؤها حسب الفعالية</li>
+      <li>متابعة الأعضاء والقادة (تحسّن / تراجع) مع المسار وملاحظاتك</li>
+      <li>كل تقرير كامل باسم معده: المعايير والملاحظات، التحديات والحلول، جداول التقييم، والتقييم النهائي</li></ul>
+      <button class="btn primary" id="exDoc" ${n?"":"disabled"}>تصدير Word</button></div>
+  </div></div>`;
+  $("#exXlsx").onclick=exportExcel;$("#exDoc").onclick=exportWord;
+}
+function fileStamp(){const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+async function exportExcel(){
+  const b=$("#exXlsx")||{};b.disabled=true;b.textContent="جاري التجهيز...";
+  try{
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+    const ev=filtered(),persons=buildPersons(ev),teams=buildTeams(ev),R=v=>v==null?"":r1(v);
+    const wb=XLSX.utils.book_new();wb.Workbook={Views:[{RTL:true}]};
+    const add=(name,rows,widths)=>{const ws=XLSX.utils.aoa_to_sheet(rows);ws["!cols"]=widths.map(w=>({wch:w}));ws["!views"]=[{RTL:true}];if(rows.length>1)ws["!autofilter"]={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:rows.length-1,c:rows[0].length-1}})};XLSX.utils.book_append_sheet(wb,ws,name)};
+    add("ملخص المتابعة",[["الاسم","الدور","الفريق","عدد مرات التقييم","عدد الدورات","أول دورة","تقييم أول دورة","آخر دورة","تقييم آخر دورة","التغير عن الدورة السابقة","التغير الكلي","المتوسط العام","الحالة","آخر ملاحظة من المقيّمين","ملاحظات القائد"],
+      ...persons.map(p=>[p.name,ROLE_LBL[p.role],p.team,p.records.length,p.points.length,p.points[0]?.cycle||"",R(p.first),p.points.at(-1)?.cycle||"",R(p.last),R(p.delta),R(p.total),R(p.mean),p.status.t.replace(/^[↑↓=] /,""),p.lastNote,p.leaderNotes.map(n=>`[${fmtDate(n.createdAt)}] ${n.note}`).join("\n")])],[24,12,18,10,10,14,10,14,10,12,10,10,12,40,50]);
+    const recs=[];persons.forEach(p=>p.records.forEach(r=>recs.push([fmtDate(r.t),r.cycle,p.name,ROLE_LBL[p.role],p.team,r.evaluator,r.score,r.diff==null?"":r.diff,r.note])));
+    recs.sort((a,b)=>a[2].localeCompare(b[2],"ar"));
+    add("سجل التقييمات",[["التاريخ","الدورة","الشخص المُقيَّم","الدور","الفريق","المقيِّم","التقييم /10","الفرق عن تقييمه السابق","الملاحظة"],...recs],[12,14,24,12,18,24,10,12,50]);
+    add("أداء اللجان",[["اللجنة","الفعالية","عدد النماذج",...CRITERIA.map(c=>c.title),"المتوسط","التغير عن الدورة السابقة","متوسط تقييم الأعضاء","متوسط تقييم القادة"],...teams.map(t=>[t.team,t.cycle,t.n,...CRITERIA.map(c=>R(t.crit[c.id])),R(t.all),R(t.delta),R(t.mem),R(t.led)])],[18,14,10,10,10,12,12,10,12,12,12]);
+    const fmtList=l=>(l||[]).map(r=>`${r.name}: ${r.score??"-"}${r.note?" ("+r.note+")":""}`).join("\n");
+    add("النماذج المرسلة",[["التاريخ","الدورة","المقيِّم","الفريق",...CRITERIA.flatMap(c=>[c.title,"ملاحظات "+c.title]),"المتوسط","التحديات","كيفية التعامل","الحلول والمقترحات","مقترحات التحسين","تقييم الأعضاء","تقييم القادة","التقييم العام للأعضاء","التقييم العام للقادة","التقييم العام للفريق"],
+      ...ev.map(e=>[fmtDT(e.createdAt),e.cycle,e.evaluator,e.team,...CRITERIA.flatMap(c=>[e.scores?.[c.id]??"",e.notes?.[c.id]||""]),R(evalAvg(e)),e.challenges?.text||"",e.challenges?.handling||"",e.challenges?.solutions||"",e.suggestions||"",fmtList(e.members),fmtList(e.leaders),e.final?.members||"",e.final?.leaders||"",e.final?.team||""])],[16,14,24,18,...CRITERIA.flatMap(()=>[9,30]),9,35,35,35,35,35,35,35,35,35]);
+    const evs=new Map();ev.forEach(e=>{const k=norm(e.evaluator)+"|"+e.team;if(!evs.has(k))evs.set(k,{name:e.evaluator,team:e.team,list:[]});evs.get(k).list.push(e)});
+    add("المقيّمون",[["الاسم","الفريق","عدد مرات التقييم","أول مرة","آخر مرة","الدورات","متوسط تقييمه للفريق"],...[...evs.values()].map(x=>[x.name,x.team,x.list.length,fmtDate(x.list[0].createdAt),fmtDate(x.list.at(-1).createdAt),[...new Set(x.list.map(e=>e.cycle))].join("، "),R(avg(x.list.map(evalAvg)))])],[24,18,12,12,12,30,14]);
+    const keys=new Set(persons.map(p=>p.key));
+    add("ملاحظات القائد",[["التاريخ","الدورة","الاسم","الدور","الفريق","الملاحظة"],...NOTES.filter(n=>keys.has(n.key)).sort((a,b)=>a.createdAt-b.createdAt).map(n=>[fmtDT(n.createdAt),n.cycle||"",n.name,ROLE_LBL[n.role],n.team,n.note])],[16,14,24,12,18,60]);
+    /* ورقة مستقلة لكل لجنة بنفس ترتيب نموذج التقرير */
+    const used=new Set(wb.SheetNames);
+    committeesOf(ev).forEach(t=>{
+      const es=ev.filter(e=>e.team===t),heads=committeeHeads(t,ev),evs=committeeEvaluators(t,ev),ps=persons.filter(p=>p.team===t);
+      const rows=[[`لجنة ${t}`],["المسؤول عن اللجنة",heads.join("، ")||"غير محدد"],["المقيّمون",evs.map(x=>`${x.name} (${x.n})`).join("، ")],["عدد التقارير",es.length],[],
+        ["متابعة الأعضاء والقادة"],["الاسم","الدور","مرات التقييم","أول تقييم","آخر تقييم","التغير","الحالة","المسار عبر الفعاليات","ملاحظات القائد"],
+        ...ps.map(p=>[p.name,ROLE_LBL[p.role],p.records.length,R(p.first),R(p.last),R(p.delta),p.status.t.replace(/^[↑↓=] /,""),pathText(p),p.leaderNotes.map(n=>`[${fmtDate(n.createdAt)}] ${n.note}`).join("\n")]),[]];
+      es.forEach((e,i)=>{
+        rows.push([`التقرير ${i+1}: ${e.evaluator}`,"",`فعالية: ${e.cycle}`,"",`تاريخ التسليم: ${fmtDT(e.createdAt)}`]);
+        rows.push(["المعيار","التقييم /10","الملاحظات"]);
+        CRITERIA.forEach(c=>rows.push([c.title,e.scores?.[c.id]??"",e.notes?.[c.id]||""]));
+        rows.push(["التحديات","",e.challenges?.text||""],["كيفية التعامل معها","",e.challenges?.handling||""],["الحلول","",e.challenges?.solutions||""],["المقترحات","",e.suggestions||""]);
+        rows.push(["تقييم أعضاء اللجنة","التقييم من 10","الملاحظات"]);(e.members||[]).forEach(m=>rows.push([m.name,m.score??"",m.note||""]));
+        rows.push(["تقييم القائد / النائب","التقييم من 10","الملاحظات"]);(e.leaders||[]).forEach(m=>rows.push([m.name,m.score??"",m.note||""]));
+        rows.push(["التقييم العام للأعضاء","",e.final?.members||""],["التقييم العام للقادة","",e.final?.leaders||""],["التقييم العام للجنة ككل","",e.final?.team||""],[]);
+      });
+      const ws=XLSX.utils.aoa_to_sheet(rows);ws["!cols"]=[{wch:28},{wch:13},{wch:60},{wch:11},{wch:22},{wch:9},{wch:10},{wch:40},{wch:40}];ws["!views"]=[{RTL:true}];
+      let name=("لجنة "+t).replace(/[\\\/\?\*\[\]:]/g," ").slice(0,31),k=2;while(used.has(name))name=name.slice(0,28)+" "+k++;used.add(name);
+      XLSX.utils.book_append_sheet(wb,ws,name);
+    });
+    const buf=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+    if(await saveFile(`تقرير-تقييم-اللجان-${fileStamp()}.xlsx`,new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})))toast("تم تصدير ملف Excel");
+  }catch(e){toast("تعذر التصدير: "+e.message);console.error(e)}
+  b.disabled=false;b.textContent="تصدير Excel";
+}
+/* ---------- مساعدات اللجان ---------- */
+function committeeHeads(team,evals){
+  const r=((Store.settings.roster||{})[team]||{}).leaders||[];
+  if(r.length)return r;
+  const seen=new Map();
+  evals.filter(e=>e.team===team).slice().reverse().forEach(e=>(e.leaders||[]).forEach(l=>{const k=norm(l.name);if(l.name&&!seen.has(k))seen.set(k,l.name)}));
+  return [...seen.values()];
+}
+function committeeEvaluators(team,evals){const m=new Map();evals.filter(e=>e.team===team).forEach(e=>{const k=norm(e.evaluator);m.set(k,{name:e.evaluator,n:(m.get(k)?.n||0)+1})});return [...m.values()]}
+function committeesOf(evals){return [...new Set(evals.map(e=>e.team))].sort((a,b)=>a.localeCompare(b,"ar"))}
+const pathText=p=>p.points.map(x=>`${x.cycle}: ${r1(x.avg)}`).join(" ← ");
+
+async function exportWord(){
+  const ev=filtered(),persons=buildPersons(ev),teams=buildTeams(ev),s=Store.settings;
+  const C=v=>v==null?"—":r1(v);
+  const scW=v=>v==null?"—":`<span style="color:${scoreColor(v)};font-weight:bold">${r1(v)}</span>`;
+  const dW=d=>d==null?"—":`<span style="color:${d>=0.5?"#1e8a4f":d<=-0.5?"#c0303a":"#666"}">&#8206;${d>0?"+":""}${r1(d)}</span>`;
+  const stW=st=>`<span style="color:${{up:"#1e8a4f",down:"#c0303a",flat:"#555",one:"#888"}[st.k]};font-weight:bold">${st.t}</span>`;
+  const txt=v=>v?esc(v).replace(/\n/g,"<br>"):'<span style="color:#999">—</span>';
+  const T=(head,rows,widths)=>`<table width="100%" border="1" cellspacing="0" cellpadding="5" dir="rtl" style="width:100%;border-collapse:collapse"><tr>${head.map((h,i)=>`<th bgcolor="#4b3a7a" style="background:#4b3a7a;color:#ffffff"${widths?` width="${widths[i]}%"`:""}>${h}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table><p style="margin:0">&nbsp;</p>`;
+  const BOX=(h,bg="#f6f3fb")=>`<table width="100%" border="1" cellspacing="0" cellpadding="8" dir="rtl" style="width:100%;border-collapse:collapse"><tr><td bgcolor="${bg}" style="background:${bg}">${h}</td></tr></table><p style="margin:0">&nbsp;</p>`;
+  const PB=`<br clear=all style="mso-special-character:line-break;page-break-before:always">`;
+  const comms=committeesOf(ev);
+  const up=persons.filter(p=>p.status.k==="up"),down=persons.filter(p=>p.status.k==="down");
+  const logo=s.logo?`<p style="text-align:center"><img src="${s.logo}" width="160"></p>`:"";
+  const lastTeamRow=t=>teams.filter(x=>x.team===t).at(-1);
+
+  const committeeSection=t=>{
+    const es=ev.filter(e=>e.team===t),heads=committeeHeads(t,ev),evs=committeeEvaluators(t,ev);
+    const ps=persons.filter(p=>p.team===t),tr=teams.filter(x=>x.team===t);
+    const rowsP=list=>list.map(p=>[esc(p.name),p.records.length,scW(p.first),scW(p.last),dW(p.delta),stW(p.status),esc(pathText(p)),p.leaderNotes.length?p.leaderNotes.map(n=>`[${fmtDate(n.createdAt)}] ${esc(n.note)}`).join("<br>"):"—"]);
+    const pHead=["الاسم","مرات التقييم","أول تقييم","آخر تقييم","التغير","الحالة","المسار عبر الفعاليات","ملاحظات القائد"];
+    const mem=ps.filter(p=>p.role==="member"),led=ps.filter(p=>p.role==="leader");
+    return `${PB}<h1 style="text-align:right;font-size:18pt">لجنة ${esc(t)}</h1>
+${BOX(`<b>المسؤول عن اللجنة (القائد / النائب):</b> ${heads.length?heads.map(esc).join("، "):"غير محدد — أضفه من الإعدادات"}<br><b>أعضاء اللجنة المقيِّمون:</b> ${evs.map(x=>`${esc(x.name)} (${x.n})`).join("، ")}<br><b>عدد التقارير:</b> ${es.length} &nbsp;|&nbsp; <b>الفعاليات:</b> ${[...new Set(es.map(e=>e.cycle))].map(esc).join("، ")}`)}
+<h2>أداء اللجنة حسب الفعالية</h2>
+${T(["الفعالية","التقارير",...CRITERIA.map(c=>c.title),"المتوسط","التغير","تقييم الأعضاء","تقييم القادة"],tr.map(r=>[esc(r.cycle),r.n,...CRITERIA.map(c=>scW(r.crit[c.id])),scW(r.all),dW(r.delta),scW(r.mem),scW(r.led)]))}
+<h2>متابعة أعضاء اللجنة</h2>
+${mem.length?T(pHead,rowsP(mem),[16,8,8,8,7,9,26,18]):"<p>لم يتم تقييم أعضاء.</p>"}
+<h2>متابعة قادة اللجنة</h2>
+${led.length?T(pHead,rowsP(led),[16,8,8,8,7,9,26,18]):"<p>لم يتم تقييم قادة.</p>"}
+<h2>التقارير المقدّمة من أعضاء اللجنة</h2>
+${es.map((e,i)=>`<h3>${i+1}. تقرير ${esc(e.evaluator)} — فعالية ${esc(e.cycle)} — ${fmtDate(e.createdAt)}</h3>
+${T(["المعيار","التقييم /10","الملاحظات"],CRITERIA.map(c=>[`<b>${c.title}</b>`,scW(e.scores?.[c.id]),txt(e.notes?.[c.id])]),[20,12,68])}
+${T(["البند","التفاصيل"],[["التحديات",txt(e.challenges?.text)],["كيفية التعامل معها",txt(e.challenges?.handling)],["الحلول",txt(e.challenges?.solutions)],["المقترحات لتحسين أداء اللجنة",txt(e.suggestions)]],[25,75])}
+<p><b>تقييم أعضاء اللجنة:</b></p>
+${(e.members||[]).length?T(["اسم العضو","التقييم من ١٠","الملاحظات (إن وجدت)"],e.members.map(m=>[esc(m.name),scW(m.score),txt(m.note)]),[30,15,55]):"<p>—</p>"}
+<p><b>تقييم قادة اللجنة:</b></p>
+${(e.leaders||[]).length?T(["اسم القائد / النائب","التقييم من ١٠","الملاحظات (إن وجدت)"],e.leaders.map(m=>[esc(m.name),scW(m.score),txt(m.note)]),[30,15,55]):"<p>—</p>"}
+${T(["التقييم النهائي","رأي معد التقرير"],[["للأعضاء",txt(e.final?.members)],["للقادة",txt(e.final?.leaders)],["للجنة ككل",txt(e.final?.team)]],[25,75])}
+${BOX(`<b>بيانات معد التقرير:</b> الاسم: ${esc(e.evaluator)} &nbsp;|&nbsp; اللجنة: ${esc(e.team)} &nbsp;|&nbsp; تاريخ تسليم التقرير: ${fmtDT(e.createdAt)}`,"#eeeeee")}`).join("")}`;
+  };
+
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>تقرير تقييم أداء اللجان</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<style>
+@page{size:21cm 29.7cm;margin:2cm 1.8cm}
+body{font-family:'Segoe UI',Tahoma,Arial;font-size:11pt;direction:rtl;color:#222}
+h1{font-size:22pt;color:#4b3a7a;text-align:center;margin:0}
+h2{font-size:14pt;color:#4b3a7a;border-bottom:2px solid #7b5ea7;padding-bottom:3pt;margin-top:16pt}
+h3{font-size:12pt;color:#333;margin:14pt 0 4pt}
+p{margin:4pt 0}
+table{border-collapse:collapse;width:100%;direction:rtl}
+th{font-size:10pt;padding:5pt;border:1px solid #4b3a7a;text-align:right}
+td{border:1px solid #cfc8de;padding:4pt 5pt;font-size:10pt;vertical-align:top;text-align:right}
+.sub{text-align:center;color:#666}
+</style></head><body dir="rtl">
+${logo}<h1>تقرير تقييم أداء اللجان</h1>
+<p class="sub">${esc(s.clubName||DEFAULT_CLUB)} — سري ومغلق</p>
+<p class="sub">${esc(filterDesc())} — تاريخ الإصدار: ${fmtDate(Date.now())}</p>
+<h2>ملخص عام</h2>
+${T(["المؤشر","القيمة"],[["عدد التقارير المرسلة",ev.length],["عدد اللجان",comms.length],["عدد المقيّمين",new Set(ev.map(e=>norm(e.evaluator)+e.team)).size],["عدد الأعضاء والقادة المُقيَّمين",persons.length],["متوسط تقييم اللجان (من 10)",C(avg(ev.map(evalAvg)))],["تحسّنوا عن الفعالية السابقة",up.length],["تراجعوا ويحتاجون متابعة",down.length]],[70,30])}
+<h2>نظرة على اللجان</h2>
+${T(["اللجنة","المسؤول (القائد / النائب)","المقيّمون","التقارير","آخر متوسط","التغير","يحتاجون متابعة"],comms.map(t=>{const r=lastTeamRow(t);return[`<b>${esc(t)}</b>`,committeeHeads(t,ev).map(esc).join("، ")||"—",committeeEvaluators(t,ev).map(x=>esc(x.name)).join("، "),ev.filter(e=>e.team===t).length,scW(r?.all),dW(r?.delta),persons.filter(p=>p.team===t&&p.status.k==="down").map(p=>esc(p.name)).join("، ")||"—"]}))}
+${down.length?BOX(`<b>⚠ يحتاجون متابعة:</b> ${down.map(p=>`${esc(p.name)} (لجنة ${esc(p.team)}، ${dW(p.delta)})`).join("، ")}`):""}
+${up.length?BOX(`<b>✓ تحسّن ملحوظ:</b> ${up.map(p=>`${esc(p.name)} (لجنة ${esc(p.team)}، ${dW(p.delta)})`).join("، ")}`):""}
+${comms.map(committeeSection).join("")}
+${PB}<h2>الخاتمة</h2><p>في الختام، فإن هذه الملاحظات والاقتراحات والتوصيات جميعها تهدف إلى رفع كفاءة العمل، وتحقيق جودة تنظيمية عالية داخل ${esc(s.clubName||DEFAULT_CLUB)}.</p>
+</body></html>`;
+  const inClaude=!!(window.claude&&window.claude.use);
+  try{if(await saveFile(`تقرير-تقييم-اللجان-${fileStamp()}.${inClaude?"html":"doc"}`,new Blob(["\ufeff",html],{type:inClaude?"text/html":"application/msword"})))toast(inClaude?"تم التصدير — افتح الملف ببرنامج Word":"تم تصدير تقرير Word")}catch(e){toast("تعذر التصدير: "+e.message)}
+}
+
+/* ---------- تبويب الإعدادات ---------- */
+let rosterTeam="";
+function renderSettings(){
+  const s=Store.settings,cloud=Store.mode==="cloud";
+  rosterTeam=rosterTeam&&s.teams.includes(rosterTeam)?rosterTeam:s.teams[0]||"";
+  const r=(s.roster||{})[rosterTeam]||{};
+  $("#tab-settings").innerHTML=`
+  <div class="grid2">
+    <div class="panel"><h3>شعار النادي</h3><div class="hint">يظهر في أعلى الصفحة وفي صفحة الدخول وفي تقرير Word.</div>
+      <div class="logoPrev">${s.logo?`<img src="${s.logo}">`:"لا يوجد شعار"}</div>
+      <div class="row"><label class="btn primary sm" style="cursor:pointer">رفع شعار<input type="file" accept="image/*" id="stLogo" hidden></label>${s.logo?`<button class="btn danger sm" id="stLogoDel">حذف الشعار</button>`:""}</div>
+      <label class="lbl">اسم النادي (يظهر لو ما فيه شعار وفي التقارير)</label>
+      <div class="row"><input class="inp" id="stClub" value="${esc(s.clubName)}" style="flex:1"><button class="btn ghost sm" id="stClubSave">حفظ</button></div>
+    </div>
+    <div class="panel"><h3>الفعالية الحالية</h3><div class="hint">اسم الفعالية اللي يقيّم الأعضاء عليها الحين (مثلاً: «من الجين إلى الجنين»). تظهر للمقيّم أعلى النموذج، وكل تقرير ينحفظ باسمها، وعلى أساسها تنحسب المقارنة وتحسّن الأعضاء من فعالية لفعالية. لو تركتها فاضية تنحسب حسب الشهر (الحين: ${esc(monthCycle(Date.now()))}).</div>
+      <div class="row"><input class="inp" id="stCycle" value="${esc(s.cycle)}" placeholder="مثال: من الجين إلى الجنين" style="flex:1"><button class="btn primary sm" id="stCycleSave">حفظ</button></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="panel"><h3>الفرق</h3><div class="hint">الفرق اللي تظهر في قائمة الدخول.</div>
+      <div class="teamList">${s.teams.map((t,i)=>`<span class="tchip">${esc(t)}<button data-rt="${i}" title="حذف">✕</button></span>`).join("")}</div>
+      <div class="row"><input class="inp" id="stTeamNew" placeholder="اسم فريق جديد" style="flex:1"><button class="btn primary sm" id="stTeamAdd">إضافة</button></div>
+    </div>
+    <div class="panel"><h3>أسماء أعضاء كل فريق</h3><div class="hint">اختياري لكن مهم للمتابعة: الأسماء تطلع كاقتراحات للمقيّم، فينكتب اسم الشخص بنفس الطريقة كل مرة وتنحسب تقييماته مع بعض.</div>
+      <select class="inp" id="stRTeam" style="margin-bottom:10px">${s.teams.map(t=>`<option ${t===rosterTeam?"selected":""}>${esc(t)}</option>`).join("")}</select>
+      <label class="lbl">الأعضاء (كل اسم في سطر)</label><textarea class="inp" id="stRMem" rows="5">${esc((r.members||[]).join("\n"))}</textarea>
+      <label class="lbl">القائد والنائب — يظهرون كمسؤولين عن اللجنة في التقارير</label><textarea class="inp" id="stRLead" rows="2">${esc((r.leaders||[]).join("\n"))}</textarea>
+      <div class="mact"><button class="btn primary sm" id="stRSave">حفظ الأسماء</button></div>
+    </div>
+  </div>
+  <div class="panel"><h3>الحساب والأمان</h3>
+    ${cloud?`<div class="hint">✅ متصل بقاعدة البيانات. لما يتسلّم قائد جديد، غيّر كلمة المرور من هنا وسلّمه الجديدة.</div>`:
+    `<div class="hint">⚠ أنت في وضع التجربة: البيانات محفوظة في هذا المتصفح فقط ولن يراها غيرك. في أول دخول يختار القائد كلمة المرور.</div>`}
+    <div class="row" style="margin-bottom:12px;align-items:stretch">
+      <input class="inp" type="password" id="stPassCur" placeholder="كلمة المرور الحالية" dir="ltr" style="flex:1;min-width:180px;max-width:260px">
+      <input class="inp" type="password" id="stPass" placeholder="كلمة المرور الجديدة (6 أحرف أو أكثر)" dir="ltr" style="flex:1;min-width:180px;max-width:260px">
+      <button class="btn primary sm" id="stPassSave">تغيير كلمة المرور</button>
+    </div>
+    <div class="hint">للدخول للوحة: افتح رابط الموقع وأضف في آخره <b dir="ltr">#leader</b> ثم اكتب كلمة المرور. لا تشارك هذا الرابط إلا مع القائد.</div>
+    <button class="btn danger sm" id="stLogout">تسجيل خروج القائد</button>
+  </div>`;
+  const save=async(msg)=>{try{await Store.saveSettings(s);renderLogos();fillTeams($("#inTeam"));renderSettings();toast(msg||"تم الحفظ")}catch(e){toast("تعذر الحفظ: "+e.message)}};
+  $("#stLogo").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{s.logo=await resizeImg(f,420);save("تم رفع الشعار")}catch(err){toast("تعذر قراءة الصورة")}};
+  $("#stLogoDel")&&($("#stLogoDel").onclick=()=>{s.logo="";save("تم حذف الشعار")});
+  $("#stClubSave").onclick=()=>{s.clubName=$("#stClub").value.trim()||DEFAULT_CLUB;save()};
+  $("#stCycleSave").onclick=()=>{s.cycle=$("#stCycle").value.trim();save("تم حفظ الفعالية")};
+  $("#stTeamAdd").onclick=()=>{const v=$("#stTeamNew").value.trim();if(!v||s.teams.includes(v))return;s.teams.push(v);save("تمت إضافة الفريق")};
+  $$("[data-rt]").forEach(b=>b.onclick=async()=>{const t=s.teams[+b.dataset.rt];if(!await confirmBox("حذف فريق",`حذف «${t}» من قائمة الدخول؟ التقييمات السابقة تبقى في التقارير.`,"حذف",true))return;s.teams.splice(+b.dataset.rt,1);save("تم حذف الفريق")});
+  $("#stRTeam").onchange=e=>{rosterTeam=e.target.value;renderSettings()};
+  $("#stRSave").onclick=()=>{const L=id=>[...new Set($(id).value.split("\n").map(x=>x.trim().replace(/\s+/g," ")).filter(Boolean))];s.roster=s.roster||{};s.roster[rosterTeam]={members:L("#stRMem"),leaders:L("#stRLead")};save("تم حفظ أسماء فريق "+rosterTeam)};
+  $("#stPassSave").onclick=async()=>{const v=$("#stPass").value,c=$("#stPassCur").value;if(v.length<6)return toast("كلمة المرور الجديدة لازم 6 أحرف أو أكثر");const b=$("#stPassSave");b.disabled=true;try{await Store.changePass(v,c);$("#stPass").value="";$("#stPassCur").value="";toast("تم تغيير كلمة المرور ✓")}catch(e){toast(e.message)}b.disabled=false};
+  $("#stLogout").onclick=async()=>{await Store.logout();$("#btnCloseAdmin").click();toast("تم تسجيل الخروج")};
+}
+function resizeImg(file,max){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const img=new Image();img.onerror=rej;img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/png"))};img.src=fr.result};fr.readAsDataURL(file)})}
+
+/* ===================== التشغيل ===================== */
+(async function boot(){
+  try{await Store.init()}catch(e){console.error(e);toast("تعذر الاتصال بقاعدة البيانات، يعمل الآن بوضع التجربة",4000);Store.mode="local"}
+  try{await Store.getSettings()}catch(e){console.error(e);Store.settings=Store.defaults()}
+  renderLogos();fillTeams($("#inTeam"));buildCriteria();bindRows("members");bindRows("leaders");
+  if(user&&Store.settings.teams.includes(user.team)){$("#inName").value=user.name;startForm()}
+  if(location.hash==="#leader"){history.replaceState(null,"",location.pathname+location.search);openLeader()}
+})();
+</script>
+</body>
+</html>
